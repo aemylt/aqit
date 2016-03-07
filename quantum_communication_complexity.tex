@@ -15,12 +15,16 @@
     \maketitle
 
     \begin{abstract}
-        Communication complexity is the study of how much information two or more parties need to share with each other in order to perform joint computation of a problem. There are many benefits to this model of computation, from many lower bound proofs to applications in cryptography and data streaming. In this review article, we will summarise the most exciting recent trends in the one-way form of quantum communication complexity, look at what quantum speedups already exist and what problems are still open.
+        Communication complexity is the study of how much information two or more parties need to share with each other in order to perform joint computation of a problem. There are many benefits to this model of computation, from many lower bound proofs to applications in cryptography and data streaming. In this report, we will summarise the most exciting recent trends in the one-way form of quantum communication complexity, look at what quantum speedups already exist and what problems are still open.
     \end{abstract}
 
     \section{Introduction}
 
     \section{Communication Complexity}
+
+        Communication complexity was developed by Yao in 1979 as an analysis of distributed computing \cite{Yao:1979:CQR:800135.804414}. Under this model of computation, our computation is done between two parties, commonly referred to as Alice and Bob, with inputs $x$ and $y$, respectively. Alice and Bob then exchange a series of messages between each other, with the aim of the two of them being able to output $f(x, y)$. The question communication complexity asks is how many bits of information do Alice and Bob need to communicate in order for the two of them to compute a solution.
+
+        In quantum communication complexity, first proposed in 1993 by Yao \cite{366852}, we also have parties Alice and Bob given inputs $x$ and $y$, respectively, and have to produce $f(x, y)$. But now our two parties can send quantum messages between each other, and the complexity is measured in the number of qubits that are communicated. Another model by Burhman and Cleve \cite{quant-ph/9704026} does not use the physical sending of data between the parties, but instead uses the measurement of entangled particles for remote computation. Our focus for this report however will be on the former.
 
         \subsection{One-Way Communication Complexity}
 
@@ -28,12 +32,12 @@
 
         Even before Yao's work on the formalisation of Communication Complexity, it was clear that quantum communication would not be able to speed up some problems. In particular, a consequence of Holevo's theorem \cite{Hol73}, meant that while a message of $n$ bits could be compressed into a message of at most $n-1$ qubits, the same message could not be retrieved from said qubits. We phrase this as a one-way communication complexity problem below.
 
-    \begin{codebox}
-        \Procname{Problem $\proc{COMMUNICATION}$}
-        \zi \const{Alice's input:} an $n$-bit string $x$.
-        \zi \const{Bob's input:} none.
-        \zi \const{Bob's output:} $x$.
-    \end{codebox}
+        \begin{codebox}
+            \Procname{Problem $\proc{COMMUNICATION}$}
+            \zi \const{Alice's input:} an $n$-bit string $x$.
+            \zi \const{Bob's input:} none.
+            \zi \const{Bob's output:} $x$.
+        \end{codebox}
 
     By Holevo's theorem, we know that the above problem requires Alice to send $\Omega(n)$ qubits to Bob. The only exception to this is when Alice and Bob have shared entangled qubits between each other prior to computation, in which case superdense coding can be used to send two bits by sending one qubit \cite{PhysRevLett.69.2881}.
 
