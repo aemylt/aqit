@@ -6,3 +6,6 @@
 *.toc
 *.synctex.gz
 Thumbs.db
+*.bbl
+*.blg
+*.dvi
