@@ -1,12 +1,16 @@
 \documentclass[a4paper]{article}
 \usepackage[affil-it]{authblk}
 
+\usepackage[margin=1in]{geometry}
+\setlength{\parskip}{3pt}
 \usepackage{hyperref}
 
+\usepackage{clrscode}
+
 \begin{document}
-    \title{One Way Quantum Communication Complexity}
+    \title{One-Way Quantum Communication Complexity}
     \author{Dominic Moylett\thanks{\texttt{\href{dominic.moylett@bristol.ac.uk}{dominic.moylett@bristol.ac.uk}}}}
-    \affil{Centre for Quantum Engineering,\\University of Bristol}
+    \affil{Quantum Engineering Centre for Doctoral Training,\\University of Bristol}
     \date{\today}
     \maketitle
 
@@ -21,6 +25,19 @@
         \subsection{One-Way Communication Complexity}
 
         \subsection{Holevo's Theorem}
+
+        Even before Yao's work on the formalisation of Communication Complexity, it was clear that quantum communication would not be able to speed up some problems. In particular, a consequence of Holevo's theorem \cite{Hol73}, meant that while a message of $n$ bits could be compressed into a message of at most $n-1$ qubits, the same message could not be retrieved from said qubits. We phrase this as a one-way communication complexity problem below.
+
+    \begin{codebox}
+        \Procname{Problem $\proc{COMMUNICATION}$}
+        \zi \const{Alice's input:} an $n$-bit string $x$.
+        \zi \const{Bob's input:} none.
+        \zi \const{Bob's output:} $x$.
+    \end{codebox}
+
+    By Holevo's theorem, we know that the above problem requires Alice to send $\Omega(n)$ qubits to Bob. The only exception to this is when Alice and Bob have shared entangled qubits between each other prior to computation, in which case superdense coding can be used to send two bits by sending one qubit \cite{PhysRevLett.69.2881}.
+
+    While we cannot do communication of $n$ bits with fewer than $n$ qubits, we will in the next two sections look at more specific problems which we can solve by communication of fewer qubits.
 
     \section{Functions}
 
@@ -45,4 +62,7 @@
         \subsection{Open Problems}
 
         \subsection{Other Areas}
+
+    \bibliographystyle{plain}
+    \bibliography{quantum_communication_complexity}{}
 \end{document}
