@@ -4,6 +4,8 @@
 \usepackage[margin=1in]{geometry}
 \setlength{\parskip}{3pt}
 \usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{shapes}
 
 \usepackage{clrscode}
 
@@ -24,9 +26,47 @@
 
         Communication complexity was developed by Yao in 1979 as an analysis of distributed computing \cite{Yao:1979:CQR:800135.804414}. Under this model of computation, our computation is done between two parties, commonly referred to as Alice and Bob, with inputs $x$ and $y$, respectively. Alice and Bob then exchange a series of messages between each other, with the aim of the two of them being able to output $f(x, y)$. The question communication complexity asks is how many bits of information do Alice and Bob need to communicate in order for the two of them to compute a solution.
 
+        \begin{figure}[t]
+            \centering
+            \begin{tikzpicture}[->, draw, node distance=2cm]
+                \node[circle, draw] (Alice) at (0,0) {Alice};
+                \node[circle, draw] (Bob) [right of=Alice] {Bob};
+                \node (x) [above of=Alice] {$x$};
+                \node (y) [above of=Bob] {$y$};
+                \node (aout) [below of=Alice] {$f(x, y)$};
+                \node (bout) [below of=Bob] {$f(x, y)$};
+                \path
+                    (x) edge (Alice)
+                    (y) edge (Bob)
+                    (Alice) edge (aout)
+                    (Bob) edge (bout);
+                \path ([yshift=1ex]Alice.east) edge ([yshift=1ex]Bob.west);
+                \path (Bob.west) edge (Alice.east);
+                \path ([yshift=-1ex]Alice.east) edge ([yshift=-1ex]Bob.west);
+            \end{tikzpicture}
+            \caption{An example of communication complexity, with Alice and Bob sending a total of three messages between each other.}
+        \end{figure}
+
         In quantum communication complexity, first proposed in 1993 by Yao \cite{366852}, we also have parties Alice and Bob given inputs $x$ and $y$, respectively, and have to produce $f(x, y)$. But now our two parties can send quantum messages between each other, and the complexity is measured in the number of qubits that are communicated. Another model by Burhman and Cleve \cite{quant-ph/9704026} does not use the physical sending of data between the parties, but instead uses the measurement of entangled particles for remote computation. Our focus for this report however will be on the former.
 
         \subsection{One-Way Communication Complexity}
+
+        \begin{figure}[t]
+            \centering
+            \begin{tikzpicture}[->, draw, node distance=2cm]
+                \node[circle, draw] (Alice) at (0,0) {Alice};
+                \node[circle, draw] (Bob) [right of=Alice] {Bob};
+                \node (x) [above of=Alice] {$x$};
+                \node (y) [above of=Bob] {$y$};
+                \node (bout) [below of=Bob] {$f(x, y)$};
+                \path
+                    (x) edge (Alice)
+                    (y) edge (Bob)
+                    (Bob) edge (bout);
+                \path (Alice.east) edge (Bob.west);
+            \end{tikzpicture}
+            \caption{An example of one-way communication complexity. All of the communication is sent in a single message from Alice to Bob.}
+        \end{figure}
 
         \subsection{Holevo's Theorem}
 
