@@ -28,7 +28,7 @@
 
         A na\"{i}ve solution to any communication complexity problem can be completed using $n$ bits of communication: Alice sends $x$ to Bob and Bob then does all of the computation for $f(x, y)$. So the question then becomes if it is possible to compute $f(x, y)$ with $o(n)$ bits of communication.
 
-        \begin{figure}[t]
+        \begin{figure}
             \centering
             \begin{tikzpicture}[->, draw, node distance=2cm]
                 \node[circle, draw] (Alice) at (0,0) {Alice};
@@ -50,7 +50,7 @@
 
         In quantum communication complexity, first proposed in 1993 by Yao \cite{366852}, we also have parties Alice and Bob given inputs $x$ and $y$, respectively, and have to produce $f(x, y)$ for some function $f$. But now our two parties can send quantum messages between each other, and the complexity is measured in the number of qubits that are communicated.
 
-        Another model by Burhman and Cleve \cite{quant-ph/9704026} does not use the physical sending of data between the parties, but instead uses the measurement of entangled particles for remote computation. Our focus for this report however will be on the former. Note that it is possible to simulate this model by the ability to communicate quantum states: Alice generates entangled pairs of qubits and sends one of the pair to Bob.
+        Another model by Burhman and Cleve \cite{quant-ph/9704026} does not use the physical sending of data between the parties, but instead uses the measurement of entangled particles for remote computation. Our focus for this report however will be on the former. Note that it is possible to simulate this model by the ability to communicate quantum states: Alice generates entangled pairs of qubits and sends one of the pair to Bob. Likewise, it is possible to simulate communicating $l$ qubits by use of $l$ entangled pairs and $2l$ classical bits of communication, via quantum teleportation \cite{PhysRevLett.70.1895}.
 
         \subsection{One-Way Communication Complexity}
 
@@ -58,7 +58,7 @@
 
         Like general communication complexity, one-way communication complexity can also be solved na\"{i}vely in $n$ bits of communication by Alice sending $x$ to Bob. So once again, our question is if we can do better with less communication.
 
-        \begin{figure}[t]
+        \begin{figure}
             \centering
             \begin{tikzpicture}[->, draw, node distance=2cm]
                 \node[circle, draw] (Alice) at (0,0) {Alice};
@@ -82,12 +82,12 @@
 
         \begin{codebox}
             \Procname{Problem $\proc{COMMUNICATION}$}
-            \zi \const{Alice's input:} an $n$-bit string $x$.
+            \zi \const{Alice's input:} $x \in \{0, 1\}^n$.
             \zi \const{Bob's input:} none.
             \zi \const{Bob's output:} $x$.
         \end{codebox}
 
-    By Holevo's theorem, we know that the above problem requires Alice to send $\Omega(n)$ qubits to Bob. The only exception to this is when Alice and Bob have shared entangled qubits between each other prior to computation, in which case superdense coding can be used to send two bits by sending one qubit \cite{PhysRevLett.69.2881}.
+    By Holevo's theorem, we know that the above problem requires Alice to send $\Omega(n)$ qubits to Bob. A later proof by Nayak \cite{814608} shows that if we compress a message of $n$ bits into a message of $m < n$ qubits, the probability that we can successfully retrieve all $n$ bits again is at most $2^{m-n}$. The only exception to this is when Alice and Bob have shared entangled qubits between each other prior to computation, in which case superdense coding can be used to send two bits by sending one qubit \cite{PhysRevLett.69.2881}. Brassard \cite{quant-ph/0101005} explains that if we have unlimited entanglement between Alice and Bob then we can only at most reduce the amount of communication by a factor of $1/2$, as quantum teleportation can be used to send qubits from one party to the other using entangled pairs and communicating with classical bits \cite{PhysRevLett.70.1895}.
 
     While we cannot do communication of $n$ bits with fewer than $n$ qubits, we will in the next two sections look at more specific problems which we can solve by communication of fewer qubits.
 
