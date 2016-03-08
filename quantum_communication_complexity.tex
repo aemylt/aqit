@@ -95,6 +95,21 @@
 
         \subsection{Distributed Deutsch-Jozsa}
 
+        The Distributed Deutsch-Jozsa problem, first introduced by Buhrman, Cleve and Wigderson \cite{Buhrman:1998:QVC:276698.276713}, was the first example of an exponential separation between quantum and classical computation complexity. The problem, and its quantum protocol, are stated as follows, where $\mathcal{D}(x, y)$ is the Hamming distance between $x$ and $y$ and $U_x = \sum_{i=0}^{n-1}(-1)^{x_i}|i\rangle\langle i|$ for some parameter $x$:
+
+        \begin{codebox}
+            \Procname{Problem $\proc{COMMUNICATION}$}
+            \zi \const{Alice's input:} $x \in \{0, 1\}^n$.
+            \zi \const{Bob's input:} $y \in \{0, 1\}^n$.
+            \zi \const{Promise:} $x = y$ or $\mathcal{D}(x, y) = n/2$.
+            \zi \const{Bob's output:} $1$ iff $x = y$, $0$ otherwise.
+            \li Alice starts computation in the $|0\rangle^{\otimes \log n}$ state and applies $U_xH^{\otimes \log n}$ to get the state $|\psi\rangle = \sum_{i=0}^{n-1}(-1)^{x_i}|i\rangle$.
+            \li Alice sends $|\psi\rangle$ to Bob.
+            \li Bob applies $H^{\otimes \log n}U_y$ and measures in the computational basis.
+            \li Bob outputs $0$ if they measure $|0\rangle^{\otimes \log n}$ and 1 otherwise.
+            \End
+        \end{codebox}
+
         \subsection{Subgroup Membership}
 
         \subsection{Permutation Invariance}
