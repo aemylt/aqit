@@ -95,21 +95,36 @@
 
         \subsection{Distributed Deutsch-Jozsa}
 
-        The Distributed Deutsch-Jozsa problem, first introduced by Buhrman, Cleve and Wigderson \cite{Buhrman:1998:QVC:276698.276713}, was the first example of an exponential separation between quantum and classical computation complexity. The problem, and its quantum protocol, are stated as follows, where $\mathcal{D}(x, y)$ is the Hamming distance between $x$ and $y$ and $U_x = \sum_{i=0}^{n-1}(-1)^{x_i}|i\rangle\langle i|$ for some parameter $x$:
+        The Distributed Deutsch-Jozsa problem, first introduced by Buhrman, Cleve and Wigderson \cite{Buhrman:1998:QVC:276698.276713}, was the first example of an exponential separation between quantum and classical computation complexity. The problem, and its quantum protocol as described in Buhrman et al.~\cite{RevModPhys.82.665}, are stated as follows, where $\mathcal{D}(x, y)$ is the Hamming distance between $x$ and $y$ and $U_x = \sum_{i=0}^{n-1}(-1)^{x_i}|i\rangle\langle i|$ for $x \in {0, 1}^n$:
 
         \begin{codebox}
-            \Procname{Problem $\proc{COMMUNICATION}$}
+            \Procname{Protocol $\proc{DISTRIBUTED DEUTSCH-JOZSA}$}
             \zi \const{Alice's input:} $x \in \{0, 1\}^n$.
             \zi \const{Bob's input:} $y \in \{0, 1\}^n$.
             \zi \const{Promise:} $x = y$ or $\mathcal{D}(x, y) = n/2$.
-            \zi \const{Bob's output:} $1$ iff $x = y$, $0$ otherwise.
-            \li Alice starts computation in the $|0\rangle^{\otimes \log n}$ state and applies $U_xH^{\otimes \log n}$ to get the state $|\psi\rangle = \sum_{i=0}^{n-1}(-1)^{x_i}|i\rangle$.
+            \zi \const{Bob's output:} $0$ iff $x = y$, $1$ otherwise.
+            \li Alice starts computation in the $|0\rangle^{\otimes \log n}$ state and applies $U_xH^{\otimes \log n}$ to get the state $|\psi\rangle$.
             \li Alice sends $|\psi\rangle$ to Bob.
             \li Bob applies $H^{\otimes \log n}U_y$ and measures in the computational basis.
             \li Bob outputs $0$ if they measure $|0\rangle^{\otimes \log n}$ and 1 otherwise.
             \End
         \end{codebox}
 
+        The state Alice sends to Bob is $|\psi\rangle = \frac{1}{\sqrt{n}}\sum_{i=0}^{n-1} (-1)^{x_i}|i\rangle$. When Bob applies $U_y$ to this state, they end up with the state $\frac{1}{\sqrt{n}}\sum_{i=0}^{n-1}(-1)^{x_i}(-1)^{y_i}|i\rangle$. We'll now consider this state for two situations: one where $x = y$ and one where they differ in $n/2$ places, denoted $|\psi_0\rangle$ and $|\psi_1\rangle$, respectively.
+
+        Note that if $x = y$ then $(-1)^{x_i}(-1)^{y_i} = 1$, so $|\psi_0\rangle = \frac{1}{\sqrt{n}}\sum_{i = 0}^{n-1}|i\rangle$. $|\psi_1\rangle$ on the other hand will have exactly $n/2$ amplitudes which are positive, and $n/2$ amplitudes which are negative. From this we can see that $\langle\psi_0|\psi_1\rangle = \frac{n/2 - n/2}{n} = 0$, so the states can be distinguished from one another upon measurement. Finally, Bob's application of $H^{\otimes \log n}$ converts their state to the computational basis. Note that $H|\psi_o\rangle = |0\rangle^{\otimes\log n}$, so measuring this state will indicate that $x = y$ and any other state will indicate that $\mathcal{D}(x, y) = n/2$.
+
+        So we have been able to deterministically solve this problem with $O(\log n)$ qubits of communication between Alice and Bob. How much classical communication is required to solve it? It was shown in Appendix 4 of Buhrman et al. \cite{RevModPhys.82.665} that any deterministic protocol must send at least $0.007n$ bits from Alice to Bob, otherwise the protocol will fail for some input. However, this quantum speedup is lost when compared to randomised classical computation for some positive integer $c$:
+
+        \begin{codebox}
+            \Procname{Protocol $\proc{DISTRIBUTED DEUTSCH-JOZSA}$}
+            \li Alice picks $c$ unique items $a \in \{0, 1\}^n$ uniformly at random.
+            \li Alice sends $(a_i, x_{a_i}) \forall i \in \{0,...,c-1\}$.
+            \li Bob returns $0$ if $x_{a_i} = y_{a_i} \forall i \in \{0,...,c-1\}$, and $1$ otherwise.
+            \End
+        \end{codebox}
+
+        Bob always returns $0$ if $x = y$, so our protocol has no true negative results. If $\mathcal{D}(x, y) = n/2$, then the protocol fails if $x_{a_i} = y_{a_i} \forall i \in \{0,...,c-1\}$, which happens with probability $1/2^c$. Finally, note that each $a_i$ can be communicated in $\log n$ bits, so the overall communication required is $c(\log n + 1)$ bits.
         \subsection{Subgroup Membership}
 
         \subsection{Permutation Invariance}
