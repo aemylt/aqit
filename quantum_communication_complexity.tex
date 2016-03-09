@@ -4,6 +4,7 @@
 \usepackage[margin=1in]{geometry}
 \setlength{\parskip}{3pt}
 \usepackage{hyperref}
+\usepackage{mathrsfs}
 \usepackage{tikz}
 \usetikzlibrary{shapes}
 
@@ -114,18 +115,41 @@
 
         Note that if $x = y$ then $(-1)^{x_i}(-1)^{y_i} = 1$, so $|\psi_0\rangle = \frac{1}{\sqrt{n}}\sum_{i = 0}^{n-1}|i\rangle$. $|\psi_1\rangle$ on the other hand will have exactly $n/2$ amplitudes which are positive, and $n/2$ amplitudes which are negative. From this we can see that $\langle\psi_0|\psi_1\rangle = \frac{n/2 - n/2}{n} = 0$, so the states can be distinguished from one another upon measurement. Finally, Bob's application of $H^{\otimes \log n}$ converts their state to the computational basis. Note that $H|\psi_o\rangle = |0\rangle^{\otimes\log n}$, so measuring this state will indicate that $x = y$ and any other state will indicate that $\mathcal{D}(x, y) = n/2$.
 
-        So we have been able to deterministically solve this problem with $O(\log n)$ qubits of communication between Alice and Bob. How much classical communication is required to solve it? It was shown in Appendix 4 of Buhrman et al. \cite{RevModPhys.82.665} that any deterministic protocol must send at least $0.007n$ bits from Alice to Bob, otherwise the protocol will fail for some input. However, this quantum speedup is lost when compared to randomised classical computation for some positive integer $c$:
+        So we have been able to deterministically solve this problem with $O(\log n)$ qubits of communication between Alice and Bob. How much classical communication is required to solve it? It was shown in Appendix 4 of Buhrman et al.~\cite{RevModPhys.82.665} that any deterministic protocol must send at least $0.007n$ bits from Alice to Bob, otherwise the protocol will fail for some input. However, this quantum advantage is lost when compared to randomised classical computation for some positive integer $c$:
 
         \begin{codebox}
             \Procname{Protocol $\proc{DISTRIBUTED DEUTSCH-JOZSA}$}
             \li Alice picks $c$ unique items $a \in \{0, 1\}^n$ uniformly at random.
-            \li Alice sends $(a_i, x_{a_i}) \forall i \in \{0,...,c-1\}$.
-            \li Bob returns $0$ if $x_{a_i} = y_{a_i} \forall i \in \{0,...,c-1\}$, and $1$ otherwise.
+            \li Alice sends $(a_i, x_{a_i})~ \forall i \in \{0,...,c-1\}$.
+            \li Bob returns $0$ if $x_{a_i} = y_{a_i}~ \forall i \in \{0,...,c-1\}$, and $1$ otherwise.
             \End
         \end{codebox}
 
         Bob always returns $0$ if $x = y$, so our protocol has no true negative results. If $\mathcal{D}(x, y) = n/2$, then the protocol fails if $x_{a_i} = y_{a_i} \forall i \in \{0,...,c-1\}$, which happens with probability $1/2^c$. Finally, note that each $a_i$ can be communicated in $\log n$ bits, so the overall communication required is $c(\log n + 1)$ bits.
+
         \subsection{Subgroup Membership}
+
+        We saw one disadvantage of the Distributed Deutsch-Jozsa problem above was that a quantum protocol has no advantage over a randomised classical protocol. Another disadvantage is that the problem requires a {\em promise} on the input: that either the two bit strings are identical or they differ in exactly $n/2$ places. This promise results in a very contrived problem with little practical application. This begs the question: Are there any problems which do not rely on promises that yield a quantum advantage under the communication complexity model?
+
+        While this is still an open problem in quantum communication complexity, there are some problems which have shown potential. Aaronson et al.~\cite{0902.3175} were the first to explore the problem of subgroup membership as potentially yielding a quantum advantage. Their protocol for solving subgroup membership, based on an earlier quantum algorithm by Watrous \cite{Watrous:2000:SQP:795666.796590}, is described below, where $G$ is a group, $\mathscr{H}_G$ is the set of all subgroups of $G$, $|+\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)$ and $U_{G, y} = \sum_{g \in G}|yg\rangle\langle g|$ for some $y \in G$:
+
+        \begin{codebox}
+            \Procname{Protocol $\proc{SUBGROUP-MEMBERSHIP}$}
+            \zi \const{Alice's input}: $H \in \mathscr{H}_G$.
+            \zi \const{Bob's input}: $y \in G$.
+            \zi \const{Bob's output}: $1$ if $y \in H$, $0$ otherwise.
+            \li Alice prepares the state $|H\rangle = \frac{1}{\sqrt{|H|}}\sum_{h \in H}|h\rangle$, which is then sent to Bob.
+            \li Bob prepends an ancilla qubit to get $|H\rangle|+\rangle$ and applies $U_{G, y}$ controlled on the final qubit.
+            \li Bob applies a Hadamard to the second qubit and measures in the computational basis.
+        \end{codebox}
+
+        After line 2, Bob has the state $\frac{1}{\sqrt{2}}(|H\rangle|0\rangle + |yH\rangle|1\rangle)$, where $|yH\rangle = \frac{1}{\sqrt{|H|}}\sum_{yh \in H}|h\rangle$. If $y \in H$ then $yh \in H~ \forall h \in H$, so $|yH\rangle = |H\rangle$. Therefore, if $y \in H$ then $U_{G, y}|H\rangle|+\rangle = |H\rangle|+\rangle$, so applying a Hadamard to the final qubit makes the final qubit $|0\rangle$. A measurement in the computational basis will thus always yield $0$.
+
+        On the other hand, if $y \notin H$ then $\langle yH|H\rangle = 0$, so applying the Hadamard produces
+
+        $$\frac{1}{2}(|H\rangle|0\rangle + |H\rangle|1\rangle + |yH\rangle|0\rangle - |yH\rangle|1\rangle).$$
+
+        Measuring the final qubit will result in $|0\rangle$ -- and thus a false positive -- with probability $1/2$. We can repeat this protocol a constant number of times to get a negligible error probability.
 
         \subsection{Permutation Invariance}
 
