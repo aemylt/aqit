@@ -129,7 +129,7 @@
 
         \subsection{Subgroup Membership}
 
-        We saw one disadvantage of the Distributed Deutsch-Jozsa problem above was that a quantum protocol has no advantage over a randomised classical protocol. Another disadvantage is that the problem requires a {\em promise} on the input: that either the two bit strings are identical or they differ in exactly $n/2$ places. This promise results in a very contrived problem with little practical application. This begs the question: Are there any problems which do not rely on promises that yield a quantum advantage under the communication complexity model?
+        We saw one disadvantage of the Distributed Deutsch-Jozsa problem above was that a quantum protocol has no advantage over a randomised classical protocol. Another disadvantage is that the problem requires a {\em promise} on the input: that either the two bit strings are identical or they differ in exactly $n/2$ places. This promise results in a very contrived problem with little practical application. This begs the question: Are there any functions which do not rely on promises that yield a quantum advantage under the communication complexity model -- better known as {\em total functions}?
 
         While this is still an open problem in quantum communication complexity, there are some problems which have shown potential. Aaronson et al.~\cite{0902.3175} were the first to explore the problem of subgroup membership as potentially yielding a quantum advantage. Their protocol for solving subgroup membership, based on an earlier quantum algorithm by Watrous \cite{Watrous:2000:SQP:795666.796590}, is described below, where $G$ is a group, $\mathscr{H}_G$ is the set of all subgroups of $G$, $|+\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)$ and $U_{G, y} = \sum_{g \in G}|yg\rangle\langle g|$ for some $y \in G$:
 
@@ -153,6 +153,42 @@
 
         Measuring the final qubit will result in $|0\rangle$ -- and thus a false positive -- with probability $1/2$. We can repeat this protocol a constant number of times to get a negligible error probability.
 
+        So, if we can find a subgroup membership problem that cannot classically be solved using $O(\log |G|)$ bits of communication, then we will have an exponential gap between classical and quantum communication for a total function. The problem is that there are many subgroup membership problems which can be solved classically within these constraints. One example is that of normal subgroups. Aaronson et al.~\cite{0902.3175} showed that this problem can be solved with error probability of $1/2$ using only $O(\log |G|)$ bits of communication.
+
+        To explain this classical protocol, we first need to describe complex characters. For any complex field representation $\rho$ of $G$, the complex character $\chi$ is the function $\chi(g) = \textrm{tr}(\rho(g))~\forall~g\in G$. For any two elements $g, g' \in G$, we have the relation that $\chi(gg'g^{-1}) = \chi(g)$. $\chi(1)$ is the dimension of $\rho$, and the kernel of $\chi$, denoted $\textrm{ker}(\chi) = \{g \in G|\chi(g) = chi(1)\}$. If $\rho$ is irreducible then $\chi$ is an irreducible character, and the set of irreducible complex characters of $G$ is denoted $\textrm{Char}(g)$. Finally, if $H$ is a normal subgroup of $G$, then let
+
+        $$\Lambda_H = \{\chi \in \textrm{G}|H\subseteq \textrm{ker}(\chi)\}.$$
+
+        Finally, given this definition we note that
+
+        $$\sum_{\chi \in \Lambda_H}[\chi(1)]^2 = \frac{|G|}{|H|}.$$
+
+        We now describe the protocol from Aaronson et al.~\cite{0902.3175}:
+
+        \begin{codebox}
+            \Procname{Protocol $\proc{NORMAL-SUBGROUP-MEMBERSHIP}$}
+            \zi \const{Alice's input}: $H \in \mathscr{H}_G$ such that $H$ is normal.
+            \zi \const{Bob's input}: $y \in G$.
+            \zi \const{Bob's output}: $1$ if $y \in H$, $0$ otherwise.
+            \li Alice chooses a random complex character $\mu$ such that $H \subseteq \textrm{ker}(\mu)$ with probability $\frac{|H|}{|G|}[\mu(1)]^2$.
+            \li Alice sends $\mu$ to Bob.
+            \li Bob outputs $1$ if $y \in \textrm{ker}(\mu)$ and $0$ otherwise.
+        \end{codebox}
+
+        If $y \in H$ then $y \in \textrm{ker}(\mu)$, so $\mu(y) = \mu(1)$ and thus the protocol will always correctly report a member of $H$. So now we only need to consider the case where the $y \notin H$ yet the protocol accepts. This will occur if Alice picks a character $\mu$ such that $y \in \textrm{ker}(\mu)$. We shall call the set of all characters that would cause an error $B$. Based on Alice's selection criteria, the probability of an error is thus
+
+        $$\frac{|H|}{|G|}\sum_{\chi \in B}[\chi(1)]^2.$$
+
+        To analyse this further, we will look at the smallest normal subgroup of $G$ which contains both $H$ and $y$. We will call this subgroup $K$, which can be stated formally as $K = \{gkg^{-1}|g \in G, k \in H \cup \{y\}\}$. Note that $|K| \geq 2|H|$, as $\forall~h\in H, h \in K$ and $hyh^{-1} \in K$, but $hyh^{-1} \notin H$.
+
+        The final point we will need is that $B \subseteq \Lambda_K$. Consider a character $\chi \in B$. Because $\chi$ could be selected by Alice, we know that $H \subseteq \textrm{ker}(\chi)$, and also that $y \in \textrm{ker}(\chi)$ because $\chi \in B$. We can conclude from this that any other element in $K$ must also be in $\textrm{ker}(\chi)$, as $\chi(gkg^{-1}) = \chi(k)~\forall~g\in G, k\in H \cup \{y\}$. Thus $K \subseteq \textrm{ker}(\chi)$ and we can conclude that $\chi \in \Lambda_K$.
+
+        Using the above points, we can show that
+
+        $$\frac{|H|}{|G|}\sum_{\chi \in B}[\chi(1)]^2 \leq \frac{|H|}{|G|}\sum_{\chi \in \Lambda_K}[\chi(1)]^2 = \frac{|H|}{|G|}\frac{|G|}{|K|} \leq \frac{|H|}{|G|}\frac{|G|}{2|K|} = \frac{1}{2}.$$
+
+        Thus this protocol fails with probability at most $1/2$. Finally, we note that is is possible to describe a character $\mu$ sent from Alice to Bob in $\lceil\log|G|\rceil$ bits, as $\mu \in \Lambda_H$ and $|\lambda_H| \leq |Char(G)| \leq |G|$, so this protocol only needs $O(\log |G|)$ classical bits of communication. So in order to find a subgroup membership problem which provides an exponential gap between random and quantum computation, we need to consider non-normal subgroups.
+
         \subsection{Permutation Invariance}
 
     \section{Relations}
@@ -171,6 +207,6 @@
 
         \subsection{Other Areas}
 
-    \bibliographystyle{plain}
+    \bibliographystyle{alpha}
     \bibliography{quantum_communication_complexity}{}
 \end{document}
