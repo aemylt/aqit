@@ -88,9 +88,20 @@
             \zi \const{Bob's output:} $x$.
         \end{codebox}
 
-    By Holevo's theorem, we know that the above problem requires Alice to send $\Omega(n)$ qubits to Bob. A later proof by Nayak \cite{814608} shows that if we compress a message of $n$ bits into a message of $m < n$ qubits, the probability that we can successfully retrieve all $n$ bits again is at most $2^{m-n}$. The only exception to this is when Alice and Bob have shared entangled qubits between each other prior to computation, in which case superdense coding can be used to send two bits by sending one qubit \cite{PhysRevLett.69.2881}. Brassard \cite{quant-ph/0101005} explains that if we have unlimited entanglement between Alice and Bob then we can only at most reduce the amount of communication by a factor of $1/2$, as quantum teleportation can be used to send qubits from one party to the other using entangled pairs and communicating with classical bits \cite{PhysRevLett.70.1895}.
+        By Holevo's theorem, we know that the above problem requires Alice to send $\Omega(n)$ qubits to Bob. A later proof by Nayak \cite{814608} shows that if we compress a message of $n$ bits into a message of $m < n$ qubits, the probability that we can successfully retrieve all $n$ bits again is at most $2^{m-n}$. The only exception to this is when Alice and Bob have shared entangled qubits between each other prior to computation, in which case superdense coding can be used to send two bits by sending one qubit \cite{PhysRevLett.69.2881}. Brassard \cite{quant-ph/0101005} explains that if we have unlimited entanglement between Alice and Bob then we can only at most reduce the amount of communication by a factor of $1/2$, as quantum teleportation can be used to send qubits from one party to the other using entangled pairs and communicating with classical bits \cite{PhysRevLett.70.1895}.
 
-    While we cannot do communication of $n$ bits with fewer than $n$ qubits, we will in the next two sections look at more specific problems which we can solve by communication of fewer qubits.
+        Holevo's Theorem has in turn led to communication complexity problems which cannot be solved more efficiently with quantum communication. One example of this is the Inner Product problem, studied in \cite{Cleve201311}:
+
+        \begin{codebox}
+            \Procname{Problem $\proc{INNER-PRODUCT}$}
+            \zi \const{Alice's input:} $x \in \{0, 1\}^n$.
+            \zi \const{Bob's input:} $y \in \{0, 1\}^n$.
+            \zi \const{Bob's output:} $\sum_{i = 0}^{n - 1}x_i.y_i (\textrm{mod} 2)$.
+        \end{codebox}
+
+        Cleve et al.~showed that if we were able to solve this problem in less than $O(n)$ qubits of communication, then it would be possible for Alice to communicate $x$ to Bob in $o(n)$ qubits, thus violating Holevo's theorem. A summary of this proof is given in \cite{RevModPhys.82.665}.
+
+        While it is clear that we cannot solve all problems in fewer qubits than we can in classical bits, we will in the next two sections look at more specific problems which we can solve by communication of fewer qubits.
 
     \section{Functions}
 
@@ -197,11 +208,37 @@
 
         \subsection{Hidden Matching}
 
+        The Hidden Matching problem was first investigated in terms of one-way communication complexity in \cite{doi:10.1137/060651835}. The problem and its quantum protocol are defined below, where $\mathcal{M}_n$ is the set of perfect matchings on $n$-node graphs:
+
+        \begin{codebox}
+            \Procname{Protocol $\proc{HIDDEN-MATCHING}$}
+            \zi \const{Alice's input}: $x \in \{0,1\}^n$.
+            \zi \const{Bob's input}: $M \in \mathcal{M}_n$.
+            \zi \const{Bob's output}: $(i, j, x_i\oplus x_j)$ for some $(i, j) \in M$.
+            \li Alice prepares the state $|x\rangle = \frac{1}{\sqrt{n}}\sum_{i = 0}^{n - 1}(-1)^{x_i}|i\rangle$, which is then sent to Bob.
+            \li Bob measures $|x\rangle$ in the $\{\frac{1}{\sqrt{2}}(|i\rangle\pm|j\rangle)|(i, j) \in M\}$ basis and gets the state $|\psi_{i\pm j}\rangle$.
+            \li Bob returns $(i, j, b)$, where $b = 0$ if $|\psi_{i\pm j}\rangle = \frac{1}{\sqrt{2}}(|i\rangle+|j\rangle)$ and $b = 1$ if $|\psi_{i\pm j}\rangle = \frac{1}{\sqrt{2}}(|i\rangle-|j\rangle)$.
+        \end{codebox}
+
+        First, note that since $M$ is a perfect matching, each index $i \in \{0,...,n-1\}$ occurs in exactly one $(i, j)$-pair in $M$. Thus the inner product of any two different states in the basis in step 2 of the above protocol is
+
+        $$\langle\psi_{i\pm j}|\psi_{i'\pm j'}\rangle = \frac{\langle i|i'\rangle \pm \langle i|j'\rangle \pm \langle j|i'\rangle \pm \langle j|j'\rangle}{2} = 0$$
+
+        The only exception is comparing the states $|\psi_{i + j}\rangle$ and $|\psi_{i - j}\rangle$, where:
+
+        $$\langle\psi_{i + j}|\psi_{i - j}\rangle = \frac{\langle i|i\rangle - \langle j|j\rangle}{2} = 0$$
+
+        Hence this basis is orthogonal and can be measured. The probability of measuring $|\psi_{i \pm j}\rangle$ is
+
+        $$P(i\pm j) = \left|\frac{1}{\sqrt{n}}\sum_{k=0}^{n-1}(-1)^{x_k}\frac{1}{\sqrt{2}}(|i\rangle \pm |j\rangle)\right|^2 = \frac{|(-1)^{x_i} \pm (-1)^{x_j}|^2}{2n}$$.
+
+        Note that if $x_i \oplus x_j = 0$ then $x_i = x_j$, so $P(i-j) = \frac{1}{2n}(1-1) = 0$ and thus Bob will only measure the state $|\psi_{i+j}\rangle$. Likewise, if $x_i \oplus x_j = 1$ then $P(i+j) = \frac{1}{2n}(1-1) = 0$, so Bob will only measure the state $|\psi_{i-j}\rangle$. Thus this quantum protocol will always succeed at finding a matching pair, though the specific pair found occurs with probability $\frac{1}{2n}$.
+
+        As for classical one-way protocols, it was shown in \cite{doi:10.1137/060651835} that a random one-way protocol needs $\Omega(\sqrt{n})$ bits of communication, thus providing an exponential gap. Furthermore, this bound is known to be tight if public random bits are shared between Alice and Bob, as Alice can send $O(\sqrt{n})$ bits $x_i$, where $i$ is chosen from the random string. By the birthday paradox, the expected probability that a pair of indices were in Bob's matching is $1$.
+
+        So have we now found an example of a total function that separates quantum and classical one-way communication complexity? Alas, we have not. This is because a function has a one-to-one mapping from inputs to outputs. But the hidden matching problem has a one-to-many mapping; Bob is allowed to output any $(i, j, x_i \oplus x_j)$ tuple under the condition that $(i, j) \in M$, thus there are $\frac{n}{2}$ acceptable outputs for this problem. This makes the hidden matching problem not a function, but a {\em relation}.
+
         \subsection{$\alpha$-matching}
-
-    \section{Applications}
-
-    \section{Implementations}
 
     \section{Conclusion}
 
@@ -209,6 +246,6 @@
 
         \subsection{Other Areas}
 
-    \bibliographystyle{alpha}
+    \bibliographystyle{plain}
     \bibliography{quantum_communication_complexity}{}
 \end{document}
