@@ -217,7 +217,7 @@
             \zi \const{Bob's output}: $(i, j, x_i\oplus x_j)$ for some $(i, j) \in M$.
             \li Alice prepares the state $|x\rangle = \frac{1}{\sqrt{n}}\sum_{i = 0}^{n - 1}(-1)^{x_i}|i\rangle$, which is then sent to Bob.
             \li Bob measures $|x\rangle$ in the $\{\frac{1}{\sqrt{2}}(|i\rangle\pm|j\rangle)|(i, j) \in M\}$ basis and gets the state $|\psi_{i\pm j}\rangle$.
-            \li Bob returns $(i, j, b)$, where $b = 0$ if $|\psi_{i\pm j}\rangle = \frac{1}{\sqrt{2}}(|i\rangle+|j\rangle)$ and $b = 1$ if $|\psi_{i\pm j}\rangle = \frac{1}{\sqrt{2}}(|i\rangle-|j\rangle)$.
+            \li Bob returns $(i, j, b)$, where $b = 0$ if $|\psi_{i\pm j}\rangle = \frac{\pm 1}{\sqrt{2}}(|i\rangle+|j\rangle)$ and $b = 1$ if $|\psi_{i\pm j}\rangle = \frac{\pm 1}{\sqrt{2}}(|i\rangle-|j\rangle)$.
         \end{codebox}
 
         First, note that since $M$ is a perfect matching, each index $i \in \{0,...,n-1\}$ occurs in exactly one $(i, j)$-pair in $M$. Thus the inner product of any two different states in the basis in step 2 of the above protocol is
@@ -238,7 +238,22 @@
 
         So have we now found an example of a total function that separates quantum and classical one-way communication complexity? Alas, we have not. This is because a function has a one-to-one mapping from inputs to outputs. But the hidden matching problem has a one-to-many mapping; Bob is allowed to output any $(i, j, x_i \oplus x_j)$ tuple under the condition that $(i, j) \in M$, thus there are $\frac{n}{2}$ acceptable outputs for this problem. This makes the hidden matching problem not a function, but a {\em relation}.
 
-        \subsection{$\alpha$-matching}
+        \subsection{$\alpha$-Matching}
+
+        $\alpha$-matching is a promise function related to the hidden matching problem described earlier. It was first studied for one-way communication complexity by Gavinsky et al.~\cite{Gavinsky:2007:ESO:1250790.1250866}. In $\alpha$-matching, the matching given to Bob consists of $\alpha n$ pairs, such that no index occurs in more than one pair. If $\alpha = 1/2$ then the matching is a perfect matching like before, and if $\alpha < 1/2$ then the matching is called a $partial$ matching. The problem and its quantum protocol are described as follows, where $\mathcal{M}_{\alpha n}$ is the set of all $\alpha$-matchings:
+
+        \begin{codebox}
+            \Procname{Protocol $\proc{$\alpha$-MATCHING}$}
+            \zi \const{Alice's input}: $x \in \{0,1\}^n$.
+            \zi \const{Bob's input}: $M \in \mathcal{M}_{\alpha n}, w \in \{0, 1\}^{\alpha n}$.
+            \zi \const{Promise}: $w = Mx$ or $\bar{w} = Mx$.
+            \zi \const{Bob's output}: $0$ if $w = Mx$, $1$ otherwise.
+            \li Alice prepares the state $|x\rangle = \frac{1}{\sqrt{n}}\sum_{i = 0}^{n - 1}(-1)^{x_i}|i\rangle$, which is then sent to Bob.
+            \li Bob adds $(i, j)$ pairs to their matching to get a perfect matching $M'$.
+            \li Bob measures $|x\rangle$ in the $\{\frac{1}{\sqrt{2}}(|i\rangle\pm|j\rangle)|(i, j) \in M'\}$ basis and gets the state $|\psi_{i\pm j}\rangle$.
+            \li If $(i, j) \notin M$ then Bob aborts.
+            \li Bob outputs $0$ if $|\psi_{i\pm j}\rangle = \frac{\pm 1}{\sqrt{2}}(|i\rangle+|j\rangle)$ and $1$ if $|\psi_{i\pm j}\rangle = \frac{\pm 1}{\sqrt{2}}(|i\rangle-|j\rangle)$.
+        \end{codebox}
 
     \section{Conclusion}
 
