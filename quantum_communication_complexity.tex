@@ -1,6 +1,8 @@
 \documentclass[a4paper]{article}
-\usepackage[affil-it]{authblk}
 
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage[affil-it]{authblk}
 \usepackage[margin=1in]{geometry}
 \setlength{\parskip}{3pt}
 \usepackage{hyperref}
@@ -207,6 +209,11 @@
     \section{Relations}
 
         \subsection{Hidden Matching}
+        \label{sec:hidden-matching}
+
+        A matching $M$ is a sequence of pairs $(i_1, j_1), (i_2, j_2),...,(i_k, j_k) \in [n]^2$. If no integer appears in any pair more than once, then the pairs are {\em disjoint}. A matching is said to be {\em partial} the pairs are disjoint but some indexes do not appear in any pair, and {\em perfect} if each integer appears in exactly one pair. A matching $M$ together with an $n$-bit string $x$ define a $k$-bit string as follows:
+
+        $$Mx = (x_{i_1} \oplus x_{j_1}), (x_{i_2} \oplus x_{j_2}), ... (x_{i_k} \oplus x_{j_k})$$
 
         The Hidden Matching problem was first investigated in terms of one-way communication complexity in \cite{doi:10.1137/060651835}. The problem and its quantum protocol are defined below, where $\mathcal{M}_n$ is the set of perfect matchings on $n$-node graphs:
 
@@ -240,7 +247,7 @@
 
         \subsection{$\alpha$-Matching}
 
-        $\alpha$-matching is a promise function related to the hidden matching problem described earlier. It was first studied for one-way communication complexity by Gavinsky et al.~\cite{Gavinsky:2007:ESO:1250790.1250866}. In $\alpha$-matching, the matching given to Bob consists of $\alpha n$ pairs, such that no index occurs in more than one pair. If $\alpha = 1/2$ then the matching is a perfect matching like before, and if $\alpha < 1/2$ then the matching is called a $partial$ matching. The problem and its quantum protocol are described as follows, where $\mathcal{M}_{\alpha n}$ is the set of all $\alpha$-matchings:
+        $\alpha$-matching is a promise function related to the hidden matching problem described earlier. It was first studied for one-way communication complexity by Gavinsky et al.~\cite{Gavinsky:2007:ESO:1250790.1250866}. In $\alpha$-matching, the matching given to Bob consists of $\alpha n$ pairs for, such that no index occurs in more than one pair. If $\alpha = 1/2$ then the matching is perfect like before, and if $\alpha < 1/2$ then the matching is partial. The problem and its quantum protocol are described as follows, where $\mathcal{M}_{\alpha n}$ is the set of all $\alpha$-matchings, and $\bar{x}$ is the bitwise NOT of the string $x$:
 
         \begin{codebox}
             \Procname{Protocol $\proc{$\alpha$-MATCHING}$}
@@ -248,12 +255,70 @@
             \zi \const{Bob's input}: $M \in \mathcal{M}_{\alpha n}, w \in \{0, 1\}^{\alpha n}$.
             \zi \const{Promise}: $w = Mx$ or $\bar{w} = Mx$.
             \zi \const{Bob's output}: $0$ if $w = Mx$, $1$ otherwise.
-            \li Alice prepares the state $|x\rangle = \frac{1}{\sqrt{n}}\sum_{i = 0}^{n - 1}(-1)^{x_i}|i\rangle$, which is then sent to Bob.
             \li Bob adds $(i, j)$ pairs to their matching to get a perfect matching $M'$.
-            \li Bob measures $|x\rangle$ in the $\{\frac{1}{\sqrt{2}}(|i\rangle\pm|j\rangle)|(i, j) \in M'\}$ basis and gets the state $|\psi_{i\pm j}\rangle$.
+            \li Alice and Bob engage in the protocol for Hidden Matching on $M'$ to get tuple $(i, j, x_i \oplus x_j)$
             \li If $(i, j) \notin M$ then Bob aborts.
             \li Bob outputs $0$ if $|\psi_{i\pm j}\rangle = \frac{\pm 1}{\sqrt{2}}(|i\rangle+|j\rangle)$ and $1$ if $|\psi_{i\pm j}\rangle = \frac{\pm 1}{\sqrt{2}}(|i\rangle-|j\rangle)$.
         \end{codebox}
+
+        First note that Bob only needs one bit of $Mx$ to figure out which of the two cases holds. This is because of the promise we are given: either $w_i = (Mx)_i~\forall~i\in\{0,...,\alpha n - 1\}$, or $w_i \neq (Mx)_i~\forall~i\in\{0,...,\alpha n - 1\}$. So if we can find one pair $(x_i, x_j)$ such that $(i, j) \in M$, then we have solved this problem. Hence one can think of this as a reduction to the Hidden Matching problem described in Section~\ref{sec:hidden-matching}.
+
+        If $\alpha = 1/2$, then $M = M'$ and thus we have the same protocol as we had for Hidden Matching, so the protocol will always succeed in that case. Indeed, the only case where we will fail is if the hidden matching protocol returns $(i, j, x_i \oplus x_j)$ such that $(i, j) \notin M$. We can reduce this probability by repeating the protocol $O(k/\alpha)$ times for some $k \ll \alpha n$ to get a high probability of successfully finding one bit of $Mx$ with $O(\log n)$ bits of communication.
+
+        So how well can we solve this problem with classical communication? Gavinsky et al.~\cite{Gavinsky:2007:ESO:1250790.1250866} used Fourier analysis to argue how much Bob can learn if Alice sends them $c$ bits, where $1 \leq c \leq \gamma \epsilon\sqrt{n/\alpha}$, for some $\epsilon > 0, \alpha \in (0,1/4]$ and a carefully chosen value of $\gamma$ which will be described later.
+
+        If Alice's message is deterministic based on $x$, then the $c$ bits Alice sends allow Bob to define a set $A \subseteq \{0, 1\}^n$ such that $|A| \geq 2^{n-c}$ of bit strings from which they must be able to guess Alice's input $x$. The probability of Bob succeeding then is the probability of them picking a bit string $x' \in A$ such that $Mx = Mx'$. We can define the probability of Bob finding a $k$-bit string $z$ as
+
+        $$p_M(z) = \frac{|\{x \in A|Mx = z\}|}{|A|}.$$
+
+        Gavinsky et al.~ showed that as Alice's message becomes shorter than $O(\sqrt{n/\alpha})$, this probability distribution becomes arbitrarily close to the uniform distribution. They start by looking at the expected value of the squared total variational distance between the probability distribution and the uniform distribution:
+
+        $$\mathbb{E}_M[\|p_M - U\|_{tvd}^2] = \mathbb{E}_M[(\sum_{z \in \{0, 1\}^{\alpha n}}|p_M(z) - U(z)|)^2]$$
+
+        This can then be re-written as a squared inner product:
+
+        $$2^{2\alpha n}\mathbb{E}_M\left[\left(\frac{1}{2^{\alpha n}}\sum_{z \in \{0, 1\}^{\alpha n}}1 * |p_M(z) - U(z)|\right)^2\right] = 2^{2\alpha n}\mathbb{E}_M[\langle 1, |p_M(z) - U(z)|\rangle^2]$$
+
+        where $1$ is the function $1(z) = 1~\forall~z\in\{0, 1\}^{\alpha n}$ and $\langle f, g\rangle = \frac{1}{2^{\alpha n}}\sum_{z \in \{0, 1\}^{\alpha n}}f(z)g(z)$ is the inner product. By the Cauchy-Schwarz inequality, we can bound this value:
+
+        $$2^{2\alpha n}\mathbb{E}_M[\langle 1, |p_M(z) - U(z)|\rangle^2] \leq 2^{2\alpha n}\mathbb{E_M}[\|1\|_2^2\|p_M - U\|_2^2] = 2^{2\alpha n}\mathbb{E}_M[\|p_M - U\|_2^2]$$
+
+        where $\|f\|_2^2 = \langle f, f\rangle$ is the $l_2$-norm. We then use Parseval's identity and note that $\widehat{U}(z) = \widehat{f}(z)$ if $z = 0$ and $\widehat{U}(z) = 0$ otherwise.
+
+        $$2^{2\alpha n}\mathbb{E_M}[\|p_M - U\|_2^2] = 2^{2\alpha n}\mathbb{E}_M\left[\sum_{z \in \{0, 1\}^{\alpha n}}(\widehat{p_M}(z) - \widehat{U}(z))^2\right] = 2^{2\alpha n}\mathbb{E}_M\left[\sum_{z \in \{0, 1\}^{\alpha n}\setminus\{0^{\alpha n}\}}\widehat{p_M}(z)^2\right]$$
+
+        where $\widehat{f}(z) = \sum_{y \in \{0, 1\}^{\alpha n}}f(y)(-1)^{x.y}$ is the Fourier transform of $f$ and $.$ is the dot product. Gavinsky et al.~show that the Fourier transform of our probability distribution is related to the indicator function of our set of possible Alice messages $A$:
+
+        \begin{align*}
+            \widehat{p_M}(z) &= \frac{1}{2^{\alpha n}}\sum_{s \in \{0, 1\}^{\alpha n}}p_M(s)(-1)^{s.z}\\
+            &= \frac{1}{|A|2^{\alpha n}}\sum_{s \in \{0, 1\}^{\alpha n}}|\{y \in A|My = s\}|(-1)^{s.z}\\
+            &= \frac{1}{|A|2^{\alpha n}}\sum_{s \in \{0, 1\}^{\alpha n}}|\{y \in A|My = s\}|(-1)^{My.z}
+        \end{align*}
+
+        Note that there is exactly one string $s \in \{0, 1\}^{\alpha n}$ such that $My = s ~\forall~ y \in A$. Because we are summing over all $\alpha n$-bit strings, we can remove that summation:
+
+        \begin{align*}
+            \widehat{p_M}(z) &= \frac{1}{|A|2^{\alpha n}}\sum_{s \in \{0, 1\}^{\alpha n}}|\{y \in A|My = s\}|(-1)^{My.z}\\
+            &= \frac{1}{|A|2^{\alpha n}}|A|(-1)^{My.z}\\
+            &= \frac{1}{|A|2^{\alpha n}}|A|(-1)^{y.M^Tz}\\
+            &= \frac{1}{|A|2^{\alpha n}}\sum_{y \in \{0, 1\}^n}1_A(y)(-1)^{y.M^Tz}\\
+            &= \frac{2^n}{|A|2^{\alpha n}}\widehat{1_A}(M^Tz)
+        \end{align*}
+
+        where $1_A$ is the indicator function of $A$. Plugging this back into our formula, we find that
+
+        $$2^{2\alpha n}\mathbb{E}_M\left[\sum_{z \in \{0, 1\}^{\alpha n}\setminus\{0^{\alpha n}\}}\widehat{p_M}(z)^2\right] = \frac{2^{2n}}{|A|^2}\mathbb{E}_M\left[\sum_{z \in \{0, 1\}^{\alpha n}\setminus\{0^n\}}\widehat{1_A}(M^Tz)^2\right].$$
+
+        Next, we move from summing over $\alpha-n$ bit strings to summing over $n$-bit strings, and note that the set $V = |\{s \in \{0, 1\}^{\alpha n}|M^Ts = v\}| \leq 1 ~\forall~ v \in \{0, 1\}^n$. This means that our expectation over $M$ can also be described as a probability over $M$:
+
+        \begin{align*}
+            \frac{2^{2n}}{|A|^2}\mathbb{E}_M\left[\sum_{z \in \{0, 1\}^{\alpha n}\setminus\{0^n\}}\widehat{1_A}(M^Tz)^2\right] &= \frac{2^{2n}}{|A|^2}\mathbb{E}_M\left[\sum_{v \in \{0, 1\}^n\setminus\{0^n\}}|\{s \in \{0, 1\}^{\alpha n}|M^Ts = v\}|\widehat{1_A}(v)^2\right]\\
+            &= \frac{2^{2n}}{|A|^2}\sum_{v \in \{0, 1\}^n\setminus\{0^n\}}\mathrm{Pr}_M[\exists~ s \in \{0, 1\}^{\alpha n} \textrm{ s.t. } M^Ts = v]\widehat{1_A}(v)^2
+        \end{align*}
+
+        Now we need to consider what this probability over $M$ is. Suppose the Hamming weight of $v$ is $|v| = k$ for even $k$\footnote{The Hamming weight of $M^Ts$ must be even and at most $2\alpha n$, so this restriction is acceptable for the problem at hand.}. Lemma 5 of \cite{Gavinsky:2007:ESO:1250790.1250866} showed that the fraction of partial matchings in $\mathcal{M}_\alpha$ that satisfy $M^Ts = v$ is equal to $\binom{\alpha n}{k/2}/\binom{n}{k}$. In other words, the number of $\alpha$-matchings which satisfy the condition is equal to the number of $\alpha n$-bit strings with Hamming weight $k/2$ over the number of $n$-bit strings with Hamming weight $k$. We can now re-write this probability as a sum over even values of $k$:
+
+        $$\frac{2^{2n}}{|A|^2}\sum_{v \in \{0, 1\}^n\setminus\{0^n\}}\mathrm{Pr}_M[\exists~ s \in \{0, 1\}^{\alpha n} \textrm{ s.t. } M^Ts = v]\widehat{1_A}(v)^2 = \frac{2^{2n}}{|A|^2}\sum_{\textrm{even }k=2}^{2\alpha n}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\sum_{v:|v| = k}\widehat{1_A}(v)^2$$
 
     \section{Conclusion}
 
@@ -261,6 +326,6 @@
 
         \subsection{Other Areas}
 
-    \bibliographystyle{plain}
+    \bibliographystyle{alpha}
     \bibliography{quantum_communication_complexity}{}
 \end{document}
