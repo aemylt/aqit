@@ -204,10 +204,6 @@
 
         Thus this protocol fails with probability at most $1/2$. Finally, we note that is is possible to describe a character $\mu$ sent from Alice to Bob in $\lceil\log|G|\rceil$ bits, as $\mu \in \Lambda_H$ and $|\lambda_H| \leq |Char(G)| \leq |G|$, so this protocol only needs $O(\log |G|)$ classical bits of communication. So in order to find a subgroup membership problem which provides an exponential gap between random and quantum computation, we need to consider non-normal subgroups.
 
-        \subsection{Permutation Invariance}
-
-    \section{Relations}
-
         \subsection{Hidden Matching}
         \label{sec:hidden-matching}
 
@@ -363,6 +359,10 @@
         $$(\mathbb{E}_M[\|p_M - U\|_{tvd}])^2 \leq \mathbb{E}_M[\|p_M - U\|_{tvd}^2] \leq \epsilon^2.$$
 
         Square-rooting these terms gives us that the total variation distance between Bob's probability distribution and the uniform becomes arbitrarily small if Alice sends much less than $\sqrt{n/\alpha}$ bits of classical data to Bob. Thus an exponential separation is shown.
+
+        A more general version of the problem was explored by Verbin and Yu in 2011 \cite{Verbin:2011:SCC:2133036.2133038}, where they looked at $t$-dimensional hypermatching. In this problem, Bob's input is now a hypermatching which matches $t$ bits together. So if $x$ is a $kt$-bit string for some integer $k$ and the $t$-dimensional hypermatching is $M = ((i_{1,1},...,i_{1,t}),(i_{k, 1},...,i_{k, t}))$, the string $Mx = \bigoplus_{0 \leq j < t}x_{i_{1, j}},...,\bigoplus_{0, \leq j < t}x_{i_{k, j}}$. Although their work did not show any bounds for quantum communication, Verbin and Yu showed that this problem requires $\Omega(n^{1-1/t})$ bits of classical communication. Note that this is consistent with Gavinsky et al.'s results for perfect matching in particular, as $t=2$ in that case.
+
+        \subsection{Permutation Invariance}
 
     \section{Conclusion}
 
