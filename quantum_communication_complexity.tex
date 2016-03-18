@@ -320,6 +320,50 @@
 
         $$\frac{2^{2n}}{|A|^2}\sum_{v \in \{0, 1\}^n\setminus\{0^n\}}\mathrm{Pr}_M[\exists~ s \in \{0, 1\}^{\alpha n} \textrm{ s.t. } M^Ts = v]\widehat{1_A}(v)^2 = \frac{2^{2n}}{|A|^2}\sum_{\textrm{even }k=2}^{2\alpha n}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\sum_{v:|v| = k}\widehat{1_A}(v)^2$$
 
+        At this point, we are going assume that $k \leq 4c$ and let $\delta = k/4c$. Because $\delta \in (0,1]$, we can apply the Kahn, Kalai and Linial inequality \cite{21923} to find that
+
+        \begin{align*}
+            \sum_{\textrm{even }k=2}^{4c - 2}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\frac{2^{2n}}{|A|^2}\sum_{v:|v| = k}\widehat{1_A}(v)^2 &\leq \sum_{\textrm{even }k=2}^{4c-2}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\frac{2^{2n}}{|A|^2}\frac{1}{\delta^k}\left(\frac{|A|}{2^n}\right)^{2/(1 + \delta)}\\
+            &= \sum_{\textrm{even }k=2}^{4c - 2}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\frac{1}{\delta^k}\left(\frac{2^n}{|A|}\right)^{2\delta/(1 + \delta)}.\\
+        \end{align*}
+
+        Noting that $1 + \delta > 1$, $|A| \geq 2^{n - c}$, $c \leq \gamma \epsilon \sqrt{n/\alpha}$ and estimating that $(n/k)^k \leq \binom{n}{k} \leq (en/k)^k$ we can bound this even further:
+
+        \begin{align*}
+            \sum_{\textrm{even }k=2}^{4c - 2}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\frac{1}{\delta^k}\left(\frac{2^n}{|A|}\right)^{2\delta/(1 + \delta)} &\leq \sum_{\textrm{even }k=2}^{4c - 2}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\frac{1}{\delta^k}\left(\frac{2^n}{|A|}\right)^{k/2c}\\
+            &\leq \sum_{\textrm{even }k=2}^{4c - 2}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\left(\frac{4\sqrt{2}c}{k}\right)^{k}\\
+            &\leq \sum_{\textrm{even }k=2}^{4c - 2}\frac{(2e\alpha n)^{k/2}}{(n/k)^k}\left(\frac{4\sqrt{2}c}{k}\right)^{k}\\
+            &\leq \sum_{\textrm{even }k=2}^{4c - 2}\frac{(2e\alpha n)^{k/2}}{(n/k)^k}\left(\frac{4\sqrt{2}c}{k}\right)^{k}\\
+            &\leq \sum_{\textrm{even }k=2}^{4c - 2}\left(\frac{64e\alpha c^2}{kn}\right)^{k/2} \leq \sum_{\textrm{even }k=2}^{4c - 2}\left(\frac{64e\gamma^2\epsilon^2}{k}\right)^{k/2}
+        \end{align*}
+
+        A small value for $\gamma$ will ensure that this sum converges to at most $\epsilon^2/2$.
+
+        Now that the lower part of the sum has been bound, we need to bound the sum for values of $k \geq 4c$. For this, we note that the term $\binom{\alpha n}{k/2}/\binom{n}{k}$ decreases as $k$ increases:
+
+        \begin{align*}
+            \frac{\binom{\alpha n}{k/2 - 1}/\binom{n}{k-2}}{\binom{\alpha n}{k/2}/\binom{n}{k}} &= \frac{(k/2)!(\alpha n - k/2)!}{(k/2 - 1)!(\alpha n - k/2 + 1)!}\frac{(k-2)!(n-k + 2)!}{k!(n-k)!}\\
+            &= \frac{k/2}{\alpha n - k/2 + 1}\frac{(n - k + 1)(n - k + 2)}{k(k - 1)}\\
+            &= \frac{(n - k + 2)(n - k + 1)}{(2\alpha n - k + 2)(k - 1)} \geq \frac{n - k + 1}{k - 1} \geq 1
+        \end{align*}
+
+        We can use this and our previous estimate for binomial coefficients to bound this equation:
+
+        \begin{align*}
+            \frac{2^{2n}}{|A|^2}\sum_{\textrm{even }k=4c}^{2\alpha n}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\sum_{v:|v| = k}\widehat{1_A}(v)^2 &\leq \frac{2^{2n}}{|A|^2}\sum_{\textrm{even }k=4c}^{2\alpha n}\frac{\binom{\alpha n}{2c}}{\binom{n}{4c}}\sum_{v:|v| = k}\widehat{1_A}(v)^2\\
+            &= \frac{2^{2n}}{|A|^2}\left(\frac{8 e\alpha c}{n}\right)^{2c}\sum_{\textrm{even }k=4c}^{2\alpha n}\sum_{v:|v| = k}\widehat{1_A}(v)^2
+        \end{align*}
+
+        Finally, noting by Parseval's identity that $\sum_{v \in \{0, 1\}^n}\widehat{1_A}(v)^2 = \|1_A\|_2^2 = 2^{-n}\sum_{v \in \{0, 1\}^n}1_A(v)^2 = |A|2^{-n}$, and recalling that $c \leq \gamma \epsilon \sqrt{n/\alpha}$ and $|A| \geq 2^{n-c}$, we find that
+
+        $$\frac{2^{2n}}{|A|^2}\left(\frac{8 e\alpha c}{n}\right)^{2c}\sum_{\textrm{even }k=4c}^{2\alpha n}\sum_{v:|v| = k}\widehat{1_A}(v)^2 \leq \frac{2^n}{|A|}\left(\frac{8 e\alpha c}{n}\right)^{2c} \leq 2^c\left(\frac{8 e\alpha c}{n}\right)^{2c} \leq \left(\frac{8\sqrt{2} e\gamma\epsilon\sqrt{n}}{\sqrt{\alpha}}\right)^{2c}$$
+
+        Again, by choosing $\gamma$ to be a small enough constant, this equation can be bounded by $\epsilon^2/2$. By adding these two cases together, we find that the squared total variation distance is at most $\epsilon^2$. To conclude this proof, we use Jensen's inequality to show that
+
+        $$(\mathbb{E}_M[\|p_M - U\|_{tvd}])^2 \leq \mathbb{E}_M[\|p_M - U\|_{tvd}^2] \leq \epsilon^2.$$
+
+        Square-rooting these terms gives us that the total variation distance between Bob's probability distribution and the uniform becomes arbitrarily small if Alice sends much less than $\sqrt{n/\alpha}$ bits of classical data to Bob. Thus an exponential separation is shown.
+
     \section{Conclusion}
 
         \subsection{Open Problems}
