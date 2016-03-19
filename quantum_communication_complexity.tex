@@ -90,7 +90,19 @@
             \zi \const{Bob's output:} $x$.
         \end{codebox}
 
-        By Holevo's theorem, we know that the above problem requires Alice to send $\Omega(n)$ qubits to Bob. A later proof by Nayak \cite{814608} shows that if we compress a message of $n$ bits into a message of $m < n$ qubits, the probability that we can successfully retrieve all $n$ bits again is at most $2^{m-n}$. The only exception to this is when Alice and Bob have shared entangled qubits between each other prior to computation, in which case superdense coding can be used to send two bits by sending one qubit \cite{PhysRevLett.69.2881}. Brassard \cite{quant-ph/0101005} explains that if we have unlimited entanglement between Alice and Bob then we can only at most reduce the amount of communication by a factor of $1/2$, as quantum teleportation can be used to send qubits from one party to the other using entangled pairs and communicating with classical bits \cite{PhysRevLett.70.1895}.
+        By Holevo's theorem, we know that the above problem requires Alice to send $\Omega(n)$ qubits to Bob. A later proof by Nayak \cite{814608} shows that if we compress a message of $n$ bits into a message of $m < n$ qubits, the probability that we can successfully retrieve all $n$ bits again is at most $2^{m-n}$. This can be seen if we create an encoding $x \mapsto \{q_{x,i}|\phi_{x_i}\rangle\}$ such that $x$ is an $n$-bit string and $\{q_{x,i}|\phi_{x_i}\rangle\}$ is a mixed state over $m$ qubits. We decode this message by measuring over projection operators $\{P_x\}$. The mean probability of Bob successfully decoding an $x$ that has been selected uniformly at random is $2^{-n}\sum_{x, i}q_{x, i}\|P_x|\phi_{x,i}\rangle\|^2$. This can be bounded by making our states pure and setting $|\phi_x\rangle = \max_{|\psi_{x, i}\rangle}\|P_x|\phi_{x, i}\rangle\|^2$:
+
+        $$\frac{1}{2^n}\sum_{x, i}q_{x, i}\|P_x|\phi_{x,i}\rangle\|_2^2 \leq \frac{1}{2^n}\sum_{x}\|P_x|\phi_{x}\rangle\|_2^2$$
+
+        Next, we decompose $P_x$ into an orthonormal basis $\{|\hat{e}_{x, j}\rangle\}$ and create a subspace $E$ that spans the code words $\{|\phi_x\rangle\}$ with projection $Q$:
+
+        $$\frac{1}{2^n}\sum_{x}\|P_x|\phi_{x}\rangle\|_2^2 = \frac{1}{2^n}\sum_{x, j}\langle\phi_x|\hat{e}_{x, j}\rangle\langle\hat{e}_{x, j}|\phi_x\rangle \leq \frac{1}{2^n}\sum_{x}\|Q|\hat{e}_{x, j}\rangle\|_2^2$$
+
+        Finally, we decompose $Q = \sum_i|e_i\rangle\langle e_i|$ where $\{|e_i\rangle\}$ is an orthonormal basis spanning $E$. Note that since $|phi_x\rangle$ is conveyed in at most $m$ qubits, $|\{|e_i\rangle\}| \leq 2^m$. Hence we conclude that
+
+        $$\frac{1}{2^n}\sum_{x}\|Q|\hat{e}_{x, j}\rangle\|_2^2 \leq \frac{1}{2^n}\sum_{x, j, i}|\langle e_i|e_{x, i}\rangle \leq \frac{1}{2^n}\sum_{i}\|e_i\|_2^2 \leq 2^{m - n}.$$
+
+        As a result, as Alice sends fewer qubits to Bob, the probability of them successfully communicating a classical message decreases exponentially, and the only case where they succeed all of the time is when $m = n$. The only exception to this is when Alice and Bob have shared entangled qubits between each other prior to computation, in which case superdense coding can be used to send two bits by sending one qubit \cite{PhysRevLett.69.2881}. Brassard \cite{quant-ph/0101005} explains that if we have unlimited entanglement between Alice and Bob then we can only at most reduce the amount of communication by a factor of $1/2$, as quantum teleportation can be used to send qubits from one party to the other using entangled pairs and communicating with classical bits \cite{PhysRevLett.70.1895}.
 
         Holevo's Theorem has in turn led to communication complexity problems which cannot be solved more efficiently with quantum communication. One example of this is the Inner Product problem, studied in \cite{Cleve201311}:
 
@@ -128,7 +140,15 @@
 
         Note that if $x = y$ then $(-1)^{x_i}(-1)^{y_i} = 1$, so $|\psi_0\rangle = \frac{1}{\sqrt{n}}\sum_{i = 0}^{n-1}|i\rangle$. $|\psi_1\rangle$ on the other hand will have exactly $n/2$ amplitudes which are positive, and $n/2$ amplitudes which are negative. From this we can see that $\langle\psi_0|\psi_1\rangle = \frac{n/2 - n/2}{n} = 0$, so the states can be distinguished from one another upon measurement. Finally, Bob's application of $H^{\otimes \log n}$ converts their state to the computational basis. Note that $H|\psi_o\rangle = |0\rangle^{\otimes\log n}$, so measuring this state will indicate that $x = y$ and any other state will indicate that $\mathcal{D}(x, y) = n/2$.
 
-        So we have been able to deterministically solve this problem with $O(\log n)$ qubits of communication between Alice and Bob. How much classical communication is required to solve it? It was shown in Appendix 4 of Buhrman et al.~\cite{RevModPhys.82.665} that any deterministic protocol must send at least $0.007n$ bits from Alice to Bob, otherwise the protocol will fail for some input. However, this quantum advantage is lost when compared to randomised classical computation for some positive integer $c$:
+        So we have been able to deterministically solve this problem with $O(\log n)$ qubits of communication between Alice and Bob. How much classical communication is required to solve it? One common way of lower bounding deterministic communication protocols for a function $f$ is to partition the problem space up into rectangles $(a, b, c, d)$ such that $f(x_i, y_i) = f(x_i', y_i')$ for any pair of inputs $(x_i, y_i), (x_i', y_i') \in \{x_a,x_{a + 1},...,x_{b}\} \times \{y_c, y_{c+1},...,y_d\}$. We can lower bound the number of messages to $c$ bits if we need $2^c$ rectangles to cover the entire problem space.
+
+        For this problem, we will focus on the inputs $(x, x)$, where $x$ is an $n$-bit string with hamming weight $n/2$. There are $\binom{n}{n/2} \approx 2^n/\sqrt{n}$ such inputs, which means that at least one rectangle $R$ must contain $2^{n-c}/\sqrt{n}$ of these inputs. Because $DDJ(x, x) = 0 ~\forall~x\in \{0, 1\}^n$, all $(x, y)$-pairs in $R$ must satisfy either $x = y$ to output $0$ or $\mathcal{D}(x, y) \neq n/2$ to break the promise. Characteristic analysis detailed in \cite{RevModPhys.82.665} show that the maximum number of $(x, x)$ inputs in $R$ is $1.99^n$ \cite{frankl1987forbidden}. Hence we have the inequality
+
+        $$\frac{2^{n-c}}{\sqrt{n}} \leq 1.99^n$$
+
+        Solving for $c$ shows that $c \geq \log_2(2^n/1.99^n\sqrt{n}) = \Omega(0.007n)$. Note that Buhrman et al.~\cite{RevModPhys.82.665} provide this as a lower bound instead of an asymptotic lower bound, but this is only correct if $n \geq 728$. A plot of $\log_2(2^n/1.99^n\sqrt{n})/n$ for even values of $n$ ranging from $2$ to $998$ is given in the appendix.
+
+        Thus we have an exponential gap between deterministic classical communication and quantum communication for the Distributed Deutsch-Jozsa problem. However, this quantum advantage is lost when compared to randomised classical computation for some positive integer $c$:
 
         \begin{codebox}
             \Procname{Protocol $\proc{DISTRIBUTED DEUTSCH-JOZSA}$}
@@ -239,6 +259,10 @@
 
         As for classical one-way protocols, it was shown in \cite{doi:10.1137/060651835} that a random one-way protocol needs $\Omega(\sqrt{n})$ bits of communication, thus providing an exponential gap. Furthermore, this bound is known to be tight if public random bits are shared between Alice and Bob, as Alice can send $O(\sqrt{n})$ bits $x_i$, where $i$ is chosen from the random string. By the birthday paradox, the expected probability that a pair of indices were in Bob's matching is $1$.
 
+        Take any protocol for computing the Hidden Matching Problem with mean probability of failure $\delta$ across Alice and Bob's input. If we pick a certain input for Alice $x$, we will denote the probability of error given $x$ as $\hat{e}_x$. By Markov's inequality, $Pr[\hat{e}_x \geq 2\delta] \leq \mathbb{E}[\hat{e}_x]/2\delta = \delta/2\delta = 1/2$, so at most half of Alice's inputs can fail more than $\delta/2$ of the time.
+
+        Assuming Alice's message to Bob is written deterministically, we define the set of Alice's inputs that map to a message $\tau$ and have error less than $2\delta$ as $S_{\tau}$. Note that $\sum_{\tau}S_{\tau}$ is equal to the number of Alice's inputs with error less than $2\delta$. Using Markov's inequality above, this sum must be greater than $2^{n-1}$. Bar-Yossef et al.~ then showed that for any message $\tau$, the size of the set $S_{\tau}$ is at most $2^{\Omega(n - \sqrt{n})}$. Combining these two inequalities, the number of unique messages Alice could send to Bob is at least $2^{n - 1}/2^{n - \Omega(\sqrt{n})} = 2^{\Omega(\sqrt{n}) - 1} = 2^{\Omega(\sqrt{n})}$. Assuming Alice's input is chosen uniformly at random, the length of each message must be at least $\Omega(\sqrt{n})$ classical bits.
+
         So have we now found an example of a total function that separates quantum and classical one-way communication complexity? Alas, we have not. This is because a function has a one-to-one mapping from inputs to outputs. But the hidden matching problem has a one-to-many mapping; Bob is allowed to output any $(i, j, x_i \oplus x_j)$ tuple under the condition that $(i, j) \in M$, thus there are $\frac{n}{2}$ acceptable outputs for this problem. This makes the hidden matching problem not a function, but a {\em relation}.
 
         \subsection{$\alpha$-Matching}
@@ -252,9 +276,9 @@
             \zi \const{Promise}: $w = Mx$ or $\bar{w} = Mx$.
             \zi \const{Bob's output}: $0$ if $w = Mx$, $1$ otherwise.
             \li Bob adds $(i, j)$ pairs to their matching to get a perfect matching $M'$.
-            \li Alice and Bob engage in the protocol for Hidden Matching on $M'$ to get tuple $(i, j, x_i \oplus x_j)$
-            \li If $(i, j) \notin M$ then Bob aborts.
-            \li Bob outputs $0$ if $|\psi_{i\pm j}\rangle = \frac{\pm 1}{\sqrt{2}}(|i\rangle+|j\rangle)$ and $1$ if $|\psi_{i\pm j}\rangle = \frac{\pm 1}{\sqrt{2}}(|i\rangle-|j\rangle)$.
+            \li Alice and Bob engage in the protocol for Hidden Matching on $(x, M')$ to get tuple $(i, j, x_i \oplus x_j)$
+            \li If $(i, j) \notin M$ then Bob aborts. Otherwise let $(Mx)_k = x_i \oplus x_j$.
+            \li Bob outputs $0$ if $w_k = (Mx)_k$ and $1$ otherwise.
         \end{codebox}
 
         First note that Bob only needs one bit of $Mx$ to figure out which of the two cases holds. This is because of the promise we are given: either $w_i = (Mx)_i~\forall~i\in\{0,...,\alpha n - 1\}$, or $w_i \neq (Mx)_i~\forall~i\in\{0,...,\alpha n - 1\}$. So if we can find one pair $(x_i, x_j)$ such that $(i, j) \in M$, then we have solved this problem. Hence one can think of this as a reduction to the Hidden Matching problem described in Section~\ref{sec:hidden-matching}.
