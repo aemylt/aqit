@@ -4,13 +4,18 @@
 \usepackage{amsmath}
 \usepackage[affil-it]{authblk}
 \usepackage[margin=1in]{geometry}
-\setlength{\parskip}{3pt}
+\usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{mathrsfs}
 \usepackage{tikz}
-\usetikzlibrary{shapes}
 
 \usepackage{clrscode}
+
+\usetikzlibrary{shapes}
+
+\setlength{\parskip}{3pt}
+
+\DeclareGraphicsExtensions{.pdf}
 
 \begin{document}
     \title{One-Way Quantum Communication Complexity}
@@ -102,7 +107,7 @@
 
         $$\frac{1}{2^n}\sum_{x}\|Q|\hat{e}_{x, j}\rangle\|_2^2 \leq \frac{1}{2^n}\sum_{x, j, i}|\langle e_i|e_{x, i}\rangle \leq \frac{1}{2^n}\sum_{i}\|e_i\|_2^2 \leq 2^{m - n}.$$
 
-        As a result, as Alice sends fewer qubits to Bob, the probability of them successfully communicating a classical message decreases exponentially, and the only case where they succeed all of the time is when $m = n$. The only exception to this is when Alice and Bob have shared entangled qubits between each other prior to computation, in which case superdense coding can be used to send two bits by sending one qubit \cite{PhysRevLett.69.2881}. Brassard \cite{quant-ph/0101005} explains that if we have unlimited entanglement between Alice and Bob then we can only at most reduce the amount of communication by a factor of $1/2$, as quantum teleportation can be used to send qubits from one party to the other using entangled pairs and communicating with classical bits \cite{PhysRevLett.70.1895}.
+        As a result, if Alice sends fewer qubits to Bob, the probability of them successfully communicating a classical message decreases exponentially, and the only case where they succeed all of the time is when $m = n$. The only exception to this is when Alice and Bob have shared entangled qubits between each other prior to computation, in which case superdense coding can be used to send two bits by sending one qubit \cite{PhysRevLett.69.2881}. Brassard \cite{quant-ph/0101005} explains that if we have unlimited entanglement between Alice and Bob then we can only at most reduce the amount of communication by a factor of $1/2$, as quantum teleportation can be used to send qubits from one party to the other using entangled pairs and communicating with classical bits \cite{PhysRevLett.70.1895}.
 
         Holevo's Theorem has in turn led to communication complexity problems which cannot be solved more efficiently with quantum communication. One example of this is the Inner Product problem, studied in \cite{Cleve201311}:
 
@@ -146,7 +151,7 @@
 
         $$\frac{2^{n-c}}{\sqrt{n}} \leq 1.99^n$$
 
-        Solving for $c$ shows that $c \geq \log_2(2^n/1.99^n\sqrt{n}) = \Omega(0.007n)$. Note that Buhrman et al.~\cite{RevModPhys.82.665} provide this as a lower bound instead of an asymptotic lower bound, but this is only correct if $n \geq 728$. A plot of $\log_2(2^n/1.99^n\sqrt{n})/n$ for even values of $n$ ranging from $2$ to $998$ is given in the appendix.
+        Solving for $c$ shows that $c \geq \log_2(2^n/1.99^n\sqrt{n}) = \Omega(0.007n)$. Note that Buhrman et al.~\cite{RevModPhys.82.665} provide this as a lower bound instead of an asymptotic lower bound, but this is only correct if $n \geq 728$. A plot of $\log_2(2^n/1.99^n\sqrt{n})/n$ for even values of $n$ ranging from $2$ to $998$ is given in Appendix \ref{sec:ddj-lower-bound}.
 
         Thus we have an exponential gap between deterministic classical communication and quantum communication for the Distributed Deutsch-Jozsa problem. However, this quantum advantage is lost when compared to randomised classical computation for some positive integer $c$:
 
@@ -161,6 +166,7 @@
         Bob always returns $0$ if $x = y$, so our protocol has no true negative results. If $\mathcal{D}(x, y) = n/2$, then the protocol fails if $x_{a_i} = y_{a_i} \forall i \in \{0,...,c-1\}$, which happens with probability $1/2^c$. Finally, note that each $a_i$ can be communicated in $\log n$ bits, so the overall communication required is $c(\log n + 1)$ bits.
 
         \subsection{Subgroup Membership}
+        \label{sec:subgroup-membership}
 
         One disadvantage of the Distributed Deutsch-Jozsa problem that we saw above is that a quantum protocol has no advantage over a randomised classical protocol. Another disadvantage is that the problem is a {\em partial function}, in that it requires a {\em promise} on the input: that either the two bit strings are identical or they differ in exactly $n/2$ places. This promise results in a very contrived problem with little practical application. This begs the question: Are there any functions which do not rely on promises that yield a quantum advantage under the communication complexity model -- better known as {\em total functions}?
 
@@ -388,6 +394,39 @@
 
         \subsection{Permutation Invariance}
 
+        Permutation Invariance is a problem first studied in the context of communication complexity by Montanaro \cite{Montanaro:2011:NES:2230916.2230919}, and has connections both to the Hidden Subgroup Membership problem discussed in Section~\ref{sec:subgroup-membership} and the Hidden Matching problem discussed in Section~\ref{sec:hidden-matching}.
+
+        Let $M$ be an $n \times n$ permutation and $x$ be an $n$-bit string. We define the $n$-bit string $Mx = x_{M_i}$ for $i \in \{0,...,n-1\}$. We also define $d(a, b) = \sum_{i \in n}(a_i \oplus b_i)$ as the Hamming distance between $a$ and $b$. The problem and its quantum protocol are explained below for a parameter $\beta$:
+
+        \begin{codebox}
+            \Procname{Protocol $\proc{PERMUTATION-INVARIANCE}$}
+            \zi \const{Alice's input}: $x \in \{0,1\}^n$.
+            \zi \const{Bob's input}: an $n\times n$ permutation $M$.
+            \zi \const{Promise}: $Mx = x$ or $d(Mx, x) \geq \beta|x|$.
+            \zi \const{Bob's output}: $0$ if $Mx = x$, $1$ otherwise.
+            \li Alice sends the state $|\psi_x\rangle = \frac{1}{\sqrt{x}}\sum_{i, x_i=1}|i\rangle$ to Bob.
+            \li Bob adds an ancilla qubit in the state $\frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)$.
+            \li Bob applies the operation $M = \sum_{i \in \{0,...,n-1\}}|M_i\rangle\langle i|$ controlled on the ancilla qubit.
+            \li Bob applies a Hadamard to the ancilla qubit and measures in the computational basis.
+            \li If Bob measures $0$ they output $0$, otherwise they output $1$.
+        \end{codebox}
+
+        This protocol can be completed using $O(\log n)$ qubits of communication.
+
+        The state after step 2 of the operation is $(|0\rangle|\psi_x\rangle + |1\rangle|\psi_x\rangle)/\sqrt{2}$. After applying the controlled $M$ gate, this becomes $(|0\rangle|\psi_x\rangle + |1\rangle|\psi_{Mx}\rangle)/\sqrt{2}$, where $|\psi_{Mx}\rangle = \sum_{i, x_i = 1}|M_i\rangle$. If $Mx = x$ then $|\psi_{Mx}\rangle = |\psi_x\rangle$, so the state is not changed and Bob measures $0$ with absolute certainty.
+
+        If $Mx \neq x$ on the other hand, then the state after step 4 becomes
+
+        $$\frac{1}{2}(|0\rangle(|\psi_x\rangle + |\psi_{Mx}\rangle) + |1\rangle(|\psi_x\rangle - |\psi_{Mx}\rangle)).$$
+
+        The probability of measuring $0$ in this case is $\frac{1}{4}||\psi_x\rangle + |M\psi_x\rangle\|_2^2 = \frac{1}{2}(1 + \langle\psi_{Mx}|\psi_x\rangle)$\footnote{Since our amplitudes are real numbers, $\langle\psi_{Mx}|\psi_x\rangle = \langle\psi_x|\psi_{Mx}\rangle$.}. Since $d(Mx, x) \geq \beta|x|$, we can see that $\langle\psi_{Mx}|\psi_x\rangle \leq 1 - \beta$, so this protocol fails with probability $1 - \beta/2$.
+
+        This problem can be seen as a generalisation of subgroup membership: Alice's input is a $|G|$-bit string $x$ where $x_i = 1$ iff $i \in H$ for all $i \in G$, and Bob's permutation $M_g$ maps elements $i \in G$ to $gi$. If $g \in H$, then $M_gx = x$, otherwise $d(M_gx, x) = 2|x|$. So already there is potentially a quadratic gap between quantum and classical communication for this problem, depending on whether or not such a gap exists for subgroup membership.
+
+        The problem also relates to Hidden Matching if we only consider permutations which are completely made of disjoint pairs -- in other words, the permutation pairs bits up and swaps those pairs. Bob can build a perfect matching $M'$ by adding edges $(i, j)$ if the permutation matrix $M$ swaps $i$ with $j$. Hence this problem can be reduced to Hidden Matching, with the difference being that Bob no longer has $w$ as an input.
+
+        So, how well can we perform classically? Montanaro \cite{Montanaro:2011:NES:2230916.2230919} provided a lower bound by looking at a subproblem, where Alice has a $2n$-bit string $x$ such that $|x| = n$, Bob has a $2n \times 2n$ permutation matrix $M$ and either $Mx = x$ or $d(Mx, x) \geq n/8$. Montanaro's proof breaks the problem up into two probability distributions: $\mathcal{D}_0$ when $d(Mx, x) \geq n/8$ and $\mathcal{D}_1$ when $Mx = x$. Their conclusion was that if Alice sends fewer than $\frac{n^{7/16}}{e\textrm{ln}2} - O(\log n)$ classical bits, then $\mathcal{D}_0$ and $\mathcal{D}_1$ becomes indistinguishable from the normal distribution within constant factors, and thus the distributions are indistinguishable from each other. Thus we have another exponential gap between quantum and random communication for a promise function.
+
     \section{Conclusion}
 
         \subsection{Open Problems}
@@ -396,4 +435,23 @@
 
     \bibliographystyle{alpha}
     \bibliography{quantum_communication_complexity}{}
+
+    \appendix
+    \section{Distributed Deutsch-Jozsa Lower Bound}
+    \label{sec:ddj-lower-bound}
+
+        Figure \ref{fig:ddj-bound} shows a graph showing a plot of $\log_2(2^n/(1.99^n*\sqrt{n}))$ and $0.007n$ for even values of $n$ ranging from $2$ to $1000$. Note that the inequality $\log_2(2^n/(1.99^n*\sqrt{n})) \geq 0.0007n$ claimed in \cite{RevModPhys.82.665} only fits if $n \geq 728$.
+
+        We can see that the inequality holds for all values of $n \geq 728$ by differentiating the two sides of the equation. The right-hand side can be easily differentiated as $d(0.0007n)/dn = 0.0007$, and the left-hand side can be differentiated as follows:
+
+        $$\frac{d}{dn}\log_2\left(\frac{2^n}{1.99^n\sqrt{n}}\right) = \frac{d}{dn}\log_2\left(\frac{2^n}{1.99^n}\right) - \frac{d}{dn}\log_2(\sqrt{n}) = \log_2\left(\frac{2}{1.99}\right) - \frac{1}{\textrm{ln}(4)n}$$
+
+        As $n$ tends towards infinity, this derivative will tend towards $log_2(2/1.99) \approx 0.00723 > 0.0007$. The point when the derivative is greater than 0.0007 is when $n \geq 112$. Thus by the time the inequality by Buhrman et al.~ holds, the left hand side will be always growing at a faster rate than the right and the inequality will continue to hold.
+
+        \begin{figure}
+            \includegraphics[width=\linewidth]{ddj_bound}
+            \caption{Plot of lower bounds of Distributed Deutsch-Jozsa for $n \in \{2, 4,..., 998, 1000\}$}
+            \label{fig:ddj-bound}
+        \end{figure}
+
 \end{document}
