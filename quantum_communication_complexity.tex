@@ -7,6 +7,7 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{mathrsfs}
+\usepackage{multirow}
 \usepackage{tikz}
 
 \usepackage{clrscode}
@@ -25,16 +26,47 @@
     \maketitle
 
     \begin{abstract}
-        Communication complexity is the study of how much information two or more parties need to share with each other in order to perform joint computation of a problem. There are many benefits to this model of computation, from many lower bound proofs to applications in cryptography and data streaming. In this report, we will summarise the most exciting recent trends in the one-way form of quantum communication complexity, look at what quantum advantages already exist and what problems are still open.
+        Communication complexity is the study of how much information two or more parties need to share with each other in order to perform joint computation of a problem. There are many benefits to this model of computation, from many lower bound proofs to applications in cryptography, circuit complexity and data streaming. In this report, we will study the area of one-way communication complexity, exploring the major achievements and summarising problems for which we have found -- or believe there to be -- a significant gap between what is possible in quantum communication and what is possible in classical communication. Finally, we will look briefly at other models of communication complexity as well as open problems.
     \end{abstract}
 
     \section{Introduction}
 
+        Ever since the idea of quantum computing was first suggested, one of the most important questions in the area was what advantages would a quantum computer have over classical computers? In the decades that followed, quantum computers showed theoretical benefits in many ways, from factoring integers and solving discrete logarithms \cite{Shor:1997:PAP:264393.264406} to searching unstructed data Grover \cite{Grover:1996:FQM:237814.237866} and even solving linear sets of equations \cite{PhysRevLett.103.150502}. Given that quantum computers have shown such advantages for a single computer setting, a natural question that then arises is can they show any advantages in a multiple party setting?
+
+        Evaluating the performance of multi-party quantum computation can be achieved via the study of communication complexity. Communication complexity is a very powerful model, enough to win its creator the first ever Knuth Prize in Computer Science, and has proven useful for proving lower bounds in a wide variety of models. It has also led to applications in different forms of computation, from secure multi-party computation to data streaming. Finding separations is not easy however, and Holevo's theorem has from the very start shown us that there will be many problems which simply cannot be solved more efficiently by parties communicating qubits instead of classical bits.
+
+        In this paper, we will explore this topic, focusing specifically on one-way communication complexity, and the significant achievements in trying to find separations between classical and quantum communication. Section~\ref{sec:cc} offers a brief overview of classical and quantum communication complexity, and an explanation of Holevo's theorem. Section~\ref{sec:separations} provides examples of problems for which it is either proven or conjectured to be a separation between quantum and classical communication. We conclude in Section~\ref{sec:conclusion} with a summary of the results, a brief discussion of other communication complexity models and some open questions.
+
     \section{Communication Complexity}
+    \label{sec:cc}
 
         Communication complexity was developed by Yao in 1979 as an analysis of distributed computing \cite{Yao:1979:CQR:800135.804414}. Under this model of computation, our computation is done between two parties, commonly referred to as Alice and Bob, with inputs $x, y \in \{0, 1\}^n$, respectively. The two parties do not know each other's inputs; Alice does not know $y$ and Bob does not know $x$. Alice and Bob then exchange a series of messages between each other through a protocol established before computation, with their aim being to jointly compute $f(x, y)$. The question communication complexity asks is how many bits of information do Alice and Bob need to communicate in order for the two of them to compute a solution. We offer a sketch of a typical communication complexity problem in Figure~\ref{fig:cc}.
 
         A na\"{i}ve solution to any communication complexity problem can be completed using $n$ bits of communication: Alice sends $x$ to Bob and Bob then does all of the computation for $f(x, y)$. So the question then becomes if it is possible to compute $f(x, y)$ with $o(n)$ bits of communication.
+
+        One of the key benefits to communication complexity is that it is a useful model to prove lower bounds for, and there are a number of established techniques for doing so. For example, deterministic lower bounds can be proven by denoting the problem as a table and breaking it up into rectangles such that each rectangle covers the same output. The problem table for equality of three-bit strings for example is shown in Table~\ref{tab:eq}. Another technique for randomised communication complexity is to evaluate the problem as probability distributions, and show that the distributions which lead to either output become indistinguishable either from each other or from the normal distribution.
+
+        Although communication complexity was originally developed as a model to analyse distributed computing, a number of other applications have been found as well. Lower bounds and gaps shown in communication complexity have led to similar lower bounds in the data streaming model of computation\footnote{See \cite{TCS-002} for an explanation of the data streaming model.} such as in \cite{Gavinsky:2007:ESO:1250790.1250866} \& \cite{Verbin:2011:SCC:2133036.2133038}, as well as lower bounds for both quantum and classical circuits \cite{MSC:4265920, 366852}. Beyond the computation of lower bounds, other applications to communication complexity include security via privacy amplification \cite{Gavinsky:2007:ESO:1250790.1250866}, and secure multiparty computation in both classical and quantum settings \cite{Franklin:1992:CCS:129712.129780, Data2014, 1409.8488}.
+
+        \begin{table}
+            \begin{center}
+                \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+                    \hline
+                    \multicolumn{2}{|c|}{}&\multicolumn{8}{|c|}{Bob's Input}\\\cline{3-10}
+                    \multicolumn{2}{|c|}{}& 000 & 001 & 010 & 011 & 100 & 101 & 110 & 111\\\hline
+                    \multirow{8}{*}{Alice's Input} & 000 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\\cline{2-10}
+                    & 001 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\\cline{2-10}
+                    & 010 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\\cline{2-10}
+                    & 011 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\\cline{2-10}
+                    & 100 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\\cline{2-10}
+                    & 101 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\\cline{2-10}
+                    & 110 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\\cline{2-10}
+                    & 111 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\\hline
+                \end{tabular}
+            \end{center}
+            \caption{The problem table for equality, with Alice's input along the side and Bob's input along the top.}
+            \label{tab:eq}
+        \end{table}
 
         \begin{figure}
             \centering
@@ -56,9 +88,13 @@
             \label{fig:cc}
         \end{figure}
 
+        \subsection{Quantum Communication Complexity}
+
         In quantum communication complexity, first proposed in 1993 by Yao \cite{366852}, we also have parties Alice and Bob given inputs $x$ and $y$, respectively, and have to produce $f(x, y)$ for some function $f$. But now our two parties can send quantum messages between each other, and the complexity is measured in the number of qubits that are communicated.
 
         Another model by Burhman and Cleve \cite{quant-ph/9704026} does not use the physical sending of data between the parties, but instead uses the measurement of entangled particles for remote computation. Our focus for this report however will be on the former. Note that it is possible to simulate this model by the ability to communicate quantum states: Alice generates entangled pairs of qubits and sends one of the pair to Bob. Likewise, it is possible to simulate communicating $l$ qubits by use of $l$ entangled pairs and $2l$ classical bits of communication, via quantum teleportation \cite{PhysRevLett.70.1895}.
+
+        Because of the well-established techniques for lower-bounding classical communication complexity, a common area of research is to see if there are any problems which quantum protocols can solve by communicating fewer qubits than the number of classical bits stated in known lower bounds. Finding quantum protocols that beat classical lower bounds can give us intuition on the gap between quantum and classical communication, for both communication complexity and other models, such as those mentioned in Section~\ref{sec:cc}.
 
         \subsection{One-Way Communication Complexity}
 
@@ -86,7 +122,7 @@
 
         \subsection{Holevo's Theorem}
 
-        Even before Yao's work on the formalisation of Communication Complexity, it was clear that quantum communication would not be able to speed up some problems. In particular, a consequence of Holevo's theorem \cite{Hol73}, meant that while a message of $n$ bits could be compressed into a message of at most $n-1$ qubits, the same message could not be retrieved from said qubits. We phrase this as a one-way communication complexity problem below.
+        Even before Yao's work on the formalisation of Communication Complexity, it was clear that quantum communication would not be able to speed up some problems. In particular, a result by Holevo \cite{Hol73} gave an upper limit on the amount of information that can be extracted from a quantum state. A consequence of Holevo's theorem was that while a message of $n$ bits could be compressed into a message of at most $n-1$ qubits, the same message could not be retrieved from said qubits. We phrase this as a one-way communication complexity problem below.
 
         \begin{codebox}
             \Procname{Problem $\proc{COMMUNICATION}$}
@@ -95,17 +131,19 @@
             \zi \const{Bob's output:} $x$.
         \end{codebox}
 
-        By Holevo's theorem, we know that the above problem requires Alice to send $\Omega(n)$ qubits to Bob. A later proof by Nayak \cite{814608} shows that if we compress a message of $n$ bits into a message of $m < n$ qubits, the probability that we can successfully retrieve all $n$ bits again is at most $2^{m-n}$. This can be seen if we create an encoding $x \mapsto \{q_{x,i}|\phi_{x_i}\rangle\}$ such that $x$ is an $n$-bit string and $\{q_{x,i}|\phi_{x_i}\rangle\}$ is a mixed state over $m$ qubits. We decode this message by measuring over projection operators $\{P_x\}$. The mean probability of Bob successfully decoding an $x$ that has been selected uniformly at random is $2^{-n}\sum_{x, i}q_{x, i}\|P_x|\phi_{x,i}\rangle\|^2$. This can be bounded by making our states pure and setting $|\phi_x\rangle = \max_{|\psi_{x, i}\rangle}\|P_x|\phi_{x, i}\rangle\|^2$:
+        By Holevo's theorem, we know that the above problem requires Alice to send $\Omega(n)$ qubits to Bob. A later proof by Nayak \cite{814608} explains this result explicitly for encoding classical data in quantum data, showing that if we compress a message of $n$ bits into a message of $m < n$ qubits, the probability that we can successfully retrieve all $n$ bits again is at most $2^{m-n}$.
 
-        $$\frac{1}{2^n}\sum_{x, i}q_{x, i}\|P_x|\phi_{x,i}\rangle\|_2^2 \leq \frac{1}{2^n}\sum_{x}\|P_x|\phi_{x}\rangle\|_2^2$$
+        Nayak's proof is as follows: Suppose we create an encoding $x \mapsto \{q_{x,i}|\phi_{x_i}\rangle\}$ such that $x$ is an $n$-bit string and $\{q_{x,i}|\phi_{x_i}\rangle\}$ is a mixed state over $m$ qubits. We decode this message by measuring over projection operators $\{P_x\}$. The mean probability of Bob successfully decoding an $x$ that has been selected uniformly at random is $2^{-n}\sum_{x, i}q_{x, i}\|P_x|\phi_{x,i}\rangle\|^2$. This can be bounded by making our states pure and setting $|\phi_x\rangle = \max_{|\psi_{x, i}\rangle}\|P_x|\phi_{x, i}\rangle\|^2$:
+
+        $$\frac{1}{2^n}\sum_{x, i}q_{x, i}\|P_x|\phi_{x,i}\rangle\|^2 \leq \frac{1}{2^n}\sum_{x}\|P_x|\phi_{x}\rangle\|^2$$
 
         Next, we decompose $P_x$ into an orthonormal basis $\{|\hat{e}_{x, j}\rangle\}$ and create a subspace $E$ that spans the code words $\{|\phi_x\rangle\}$ with projection $Q$:
 
-        $$\frac{1}{2^n}\sum_{x}\|P_x|\phi_{x}\rangle\|_2^2 = \frac{1}{2^n}\sum_{x, j}\langle\phi_x|\hat{e}_{x, j}\rangle\langle\hat{e}_{x, j}|\phi_x\rangle \leq \frac{1}{2^n}\sum_{x}\|Q|\hat{e}_{x, j}\rangle\|_2^2$$
+        $$\frac{1}{2^n}\sum_{x}\|P_x|\phi_{x}\rangle\|^2 = \frac{1}{2^n}\sum_{x, j}\langle\phi_x|\hat{e}_{x, j}\rangle\langle\hat{e}_{x, j}|\phi_x\rangle \leq \frac{1}{2^n}\sum_{x}\|Q|\hat{e}_{x, j}\rangle\|^2$$
 
-        Finally, we decompose $Q = \sum_i|e_i\rangle\langle e_i|$ where $\{|e_i\rangle\}$ is an orthonormal basis spanning $E$. Note that since $|phi_x\rangle$ is conveyed in at most $m$ qubits, $|\{|e_i\rangle\}| \leq 2^m$. Hence we conclude that
+        Finally, we decompose $Q = \sum_i|e_i\rangle\langle e_i|$ where $\{|e_i\rangle\}$ is an orthonormal basis spanning $E$. Note that since $|\phi_x\rangle$ is conveyed in at most $m$ qubits, $|\{|e_i\rangle\}| \leq 2^m$. Hence we conclude that
 
-        $$\frac{1}{2^n}\sum_{x}\|Q|\hat{e}_{x, j}\rangle\|_2^2 \leq \frac{1}{2^n}\sum_{x, j, i}|\langle e_i|e_{x, i}\rangle \leq \frac{1}{2^n}\sum_{i}\|e_i\|_2^2 \leq 2^{m - n}.$$
+        $$\frac{1}{2^n}\sum_{x, j}\|Q|\hat{e}_{x, j}\rangle\|^2 \leq \frac{1}{2^n}\sum_{x, j, i}|\langle e_i|e_{x, j}\rangle|^2 \leq \frac{1}{2^n}\sum_{i}|\langle e_i|e_i\rangle|^2 \leq 2^{m - n}.$$
 
         As a result, if Alice sends fewer qubits to Bob, the probability of them successfully communicating a classical message decreases exponentially, and the only case where they succeed all of the time is when $m = n$. The only exception to this is when Alice and Bob have shared entangled qubits between each other prior to computation, in which case superdense coding can be used to send two bits by sending one qubit \cite{PhysRevLett.69.2881}. Brassard \cite{quant-ph/0101005} explains that if we have unlimited entanglement between Alice and Bob then we can only at most reduce the amount of communication by a factor of $1/2$, as quantum teleportation can be used to send qubits from one party to the other using entangled pairs and communicating with classical bits \cite{PhysRevLett.70.1895}.
 
@@ -120,13 +158,14 @@
 
         Cleve et al.~showed that if we were able to solve this problem in less than $O(n)$ qubits of communication, then it would be possible for Alice to communicate $x$ to Bob in $o(n)$ qubits, thus violating Holevo's theorem. A summary of this proof is given in \cite{RevModPhys.82.665}.
 
-        While it is clear that we cannot solve all problems in fewer qubits than we can in classical bits, we will in the next two sections look at more specific problems which we can solve by communication of fewer qubits.
+    \section{Separations Between Quantum and Classical Communication Complexity}
+    \label{sec:separations}
 
-    \section{Functions}
+        While it is clear from Holevo's theorem that we cannot solve all problems in fewer qubits than we can in classical bits, we will in this section look at a variety of functions which Alice and Bob can solve more efficiently by exchanging qubits instead of bits.
 
         \subsection{Distributed Deutsch-Jozsa}
 
-        The Distributed Deutsch-Jozsa problem, first introduced by Buhrman, Cleve and Wigderson \cite{Buhrman:1998:QVC:276698.276713}, was the first example of an exponential separation between quantum and classical computation complexity. The problem, and its quantum protocol as described in Buhrman et al.~\cite{RevModPhys.82.665}, are stated as follows, where $\mathcal{D}(x, y)$ is the Hamming distance between $x$ and $y$ and $U_x = \sum_{i=0}^{n-1}(-1)^{x_i}|i\rangle\langle i|$ for $x \in {0, 1}^n$:
+        The Distributed Deutsch-Jozsa problem, first introduced by Buhrman, Cleve and Wigderson \cite{Buhrman:1998:QVC:276698.276713}, was the first example of an exponential separation between quantum and classical computation complexity. Prior to this, the largest gaps between classical and quantum communication were constant factors \cite{quant-ph/9704026}. The problem, and its quantum protocol as described in Buhrman et al.~\cite{RevModPhys.82.665}, are stated as follows, where $\mathcal{D}(x, y)$ is the Hamming distance between $x$ and $y$ and $U_x = \sum_{i=0}^{n-1}(-1)^{x_i}|i\rangle\langle i|$ for $x \in {0, 1}^n$:
 
         \begin{codebox}
             \Procname{Protocol $\proc{DISTRIBUTED DEUTSCH-JOZSA}$}
@@ -428,6 +467,7 @@
         So, how well can we perform classically? Montanaro \cite{Montanaro:2011:NES:2230916.2230919} provided a lower bound by looking at a subproblem, where Alice has a $2n$-bit string $x$ such that $|x| = n$, Bob has a $2n \times 2n$ permutation matrix $M$ and either $Mx = x$ or $d(Mx, x) \geq n/8$. Montanaro's proof breaks the problem up into two probability distributions: $\mathcal{D}_0$ when $d(Mx, x) \geq n/8$ and $\mathcal{D}_1$ when $Mx = x$. Their conclusion was that if Alice sends fewer than $\frac{n^{7/16}}{e\textrm{ln}2} - O(\log n)$ classical bits, then $\mathcal{D}_0$ and $\mathcal{D}_1$ becomes indistinguishable from the normal distribution within constant factors, and thus the distributions are indistinguishable from each other. Thus we have another exponential gap between quantum and random communication for a promise function.
 
     \section{Conclusion}
+    \label{sec:conclusion}
 
         \subsection{Open Problems}
 
