@@ -26,16 +26,16 @@
     \maketitle
 
     \begin{abstract}
-        Communication complexity is the study of how much information two or more parties need to share with each other in order to perform joint computation of a problem. There are many benefits to this model of computation, from many lower bound proofs to applications in cryptography, circuit complexity and data streaming. In this report, we will study the area of one-way communication complexity, exploring the major achievements and summarising problems for which we have found -- or believe there to be -- a significant gap between what is possible in quantum communication and what is possible in classical communication. Finally, we will look briefly at other models of communication complexity as well as open problems.
+        Communication complexity is the study of how much information two or more parties need to share with each other in order to perform joint computation of a problem. There are many benefits to this model of computation, from many lower bound proofs to applications in cryptography, circuit complexity and data streaming. In this essay we will study the area of one-way communication complexity. We will explore the major achievements and summarising problems for which we have found -- or believe there to be -- a significant gap between what is possible in quantum communication and what is possible in classical communication. Finally, we will look briefly at other models of communication complexity as well as open problems.
     \end{abstract}
 
     \section{Introduction}
 
         Ever since the idea of quantum computing was first suggested, one of the most important questions in the area was what advantages would a quantum computer have over classical computers? In the decades that followed, quantum computers showed theoretical benefits in many ways, from factoring integers and solving discrete logarithms \cite{Shor:1997:PAP:264393.264406} to searching unstructed data Grover \cite{Grover:1996:FQM:237814.237866} and even solving linear sets of equations \cite{PhysRevLett.103.150502}. Given that quantum computers have shown such advantages for a single computer setting, a natural question that then arises is can they show any advantages in a multiple party setting?
 
-        Evaluating the performance of multi-party quantum computation can be achieved via the study of communication complexity. Communication complexity is a very powerful model, enough to win its creator the first ever Knuth Prize in Computer Science, and has proven useful for proving lower bounds in a wide variety of models. It has also led to applications in different forms of computation, from secure multi-party computation to data streaming. Finding separations is not easy however, and Holevo's theorem has from the very start shown us that there will be many problems which simply cannot be solved more efficiently by parties communicating qubits instead of classical bits.
+        Evaluating the performance of multi-party quantum computation can be achieved via the study of communication complexity. Communication complexity is a very powerful model -- enough to be one of the reasons its creator earned the first ever Donald E. Knuth Prize in Computer Science\footnote{\url{http://www.sigact.org/Prizes/Knuth/1996.html}.} -- and has proven useful for proving lower bounds in a wide variety of models. It has also led to applications in different forms of computation, from secure multi-party computation to data streaming. Finding separations is not easy however, and Holevo's theorem has from the very start shown us that there will be many problems which simply cannot be solved more efficiently by parties communicating qubits instead of classical bits.
 
-        In this paper, we will explore this topic, focusing specifically on one-way communication complexity, and the significant achievements in trying to find separations between classical and quantum communication. Section~\ref{sec:cc} offers a brief overview of classical and quantum communication complexity, and an explanation of Holevo's theorem. Section~\ref{sec:separations} provides examples of problems for which it is either proven or conjectured to be a separation between quantum and classical communication. We conclude in Section~\ref{sec:conclusion} with a summary of the results, a brief discussion of other communication complexity models and some open questions.
+        We will explore this topic in this report, focusing specifically on one-way communication complexity, and the significant achievements in trying to find separations between classical and quantum communication. Section~\ref{sec:cc} offers a brief overview of classical and quantum communication complexity, and an explanation of Holevo's theorem. Section~\ref{sec:separations} provides examples of problems for which it is either proven or conjectured to be a separation between quantum and classical communication. We conclude in Section~\ref{sec:conclusion} with a summary of the results, a brief discussion of other communication complexity models and some open questions.
 
     \section{Communication Complexity}
     \label{sec:cc}
@@ -46,7 +46,7 @@
 
         One of the key benefits to communication complexity is that it is a useful model to prove lower bounds for, and there are a number of established techniques for doing so. For example, deterministic lower bounds can be proven by denoting the problem as a table and breaking it up into rectangles such that each rectangle covers the same output. The problem table for equality of three-bit strings for example is shown in Table~\ref{tab:eq}. Another technique for randomised communication complexity is to evaluate the problem as probability distributions, and show that the distributions which lead to either output become indistinguishable either from each other or from the normal distribution.
 
-        Although communication complexity was originally developed as a model to analyse distributed computing, a number of other applications have been found as well. Lower bounds and gaps shown in communication complexity have led to similar lower bounds in the data streaming model of computation\footnote{See \cite{TCS-002} for an explanation of the data streaming model.} such as in \cite{Gavinsky:2007:ESO:1250790.1250866} \& \cite{Verbin:2011:SCC:2133036.2133038}, as well as lower bounds for both quantum and classical circuits \cite{MSC:4265920, 366852}. Beyond the computation of lower bounds, other applications to communication complexity include security via privacy amplification \cite{Gavinsky:2007:ESO:1250790.1250866}, and secure multiparty computation in both classical and quantum settings \cite{Franklin:1992:CCS:129712.129780, Data2014, 1409.8488}.
+        Although communication complexity was originally developed as a model to analyse distributed computing, a number of other applications have been found as well. Lower bounds and gaps shown in communication complexity have led to similar lower bounds in the data streaming model of computation\footnote{See \cite{TCS-002} for an explanation of the data streaming model.} such as in \cite{Gavinsky:2007:ESO:1250790.1250866} \& \cite{Verbin:2011:SCC:2133036.2133038}, as well as lower bounds for both quantum and classical circuits \cite{MSC:4265920, 366852}. Beyond the computation of lower bounds, other applications to communication complexity include classical security \cite{Gavinsky:2007:ESO:1250790.1250866} and secure multiparty computation in both classical and quantum settings \cite{Franklin:1992:CCS:129712.129780, Data2014, 1409.8488}.
 
         \begin{table}
             \begin{center}
@@ -267,7 +267,9 @@
 
         $$\frac{|H|}{|G|}\sum_{\chi \in B}[\chi(1)]^2 \leq \frac{|H|}{|G|}\sum_{\chi \in \Lambda_K}[\chi(1)]^2 = \frac{|H|}{|G|}\frac{|G|}{|K|} \leq \frac{|H|}{|G|}\frac{|G|}{2|K|} = \frac{1}{2}.$$
 
-        Thus this protocol fails with probability at most $1/2$. Finally, we note that is is possible to describe a character $\mu$ sent from Alice to Bob in $\lceil\log|G|\rceil$ bits, as $\mu \in \Lambda_H$ and $|\lambda_H| \leq |Char(G)| \leq |G|$, so this protocol only needs $O(\log |G|)$ classical bits of communication. So in order to find a subgroup membership problem which provides an exponential gap between random and quantum computation, we need to consider non-normal subgroups.
+        Thus this protocol fails with probability at most $1/2$. Finally, we note that is is possible to describe a character $\mu$ sent from Alice to Bob in $\lceil\log|G|\rceil$ bits, as $\mu \in \Lambda_H$ and $|\lambda_H| \leq |Char(G)| \leq |G|$, so this protocol only needs $O(\log |G|)$ classical bits of communication.
+
+        Other groups also proven to be solvable in $(O\log|G|)$ bits of communication include groups with small modular or representations and groups with small complex representations. So already we have three examples of groups which we need to avoid in order to find a polynomial gap.
 
         \subsection{Hidden Matching}
         \label{sec:hidden-matching}
@@ -308,7 +310,7 @@
 
         Assuming Alice's message to Bob is written deterministically, we define the set of Alice's inputs that map to a message $\tau$ and have error less than $2\delta$ as $S_{\tau}$. Note that $\sum_{\tau}S_{\tau}$ is equal to the number of Alice's inputs with error less than $2\delta$. Using Markov's inequality above, this sum must be greater than $2^{n-1}$. Bar-Yossef et al.~ then showed that for any message $\tau$, the size of the set $S_{\tau}$ is at most $2^{\Omega(n - \sqrt{n})}$. Combining these two inequalities, the number of unique messages Alice could send to Bob is at least $2^{n - 1}/2^{n - \Omega(\sqrt{n})} = 2^{\Omega(\sqrt{n}) - 1} = 2^{\Omega(\sqrt{n})}$. Assuming Alice's input is chosen uniformly at random, the length of each message must be at least $\Omega(\sqrt{n})$ classical bits.
 
-        So have we now found an example of a total function that separates quantum and classical one-way communication complexity? Alas, we have not. This is because a function has a one-to-one mapping from inputs to outputs. But the hidden matching problem has a one-to-many mapping; Bob is allowed to output any $(i, j, x_i \oplus x_j)$ tuple under the condition that $(i, j) \in M$, thus there are $\frac{n}{2}$ acceptable outputs for this problem. This makes the hidden matching problem not a function, but a {\em relation}.
+        So have we now found an example of a total function that separates quantum and classical one-way communication complexity? Alas, we have not. This is because a function has a one-to-one mapping from inputs to outputs. But the hidden matching problem has a one-to-many mapping; Bob is allowed to output any $(i, j, x_i \oplus x_j)$ tuple under the condition that $(i, j) \in M$, thus there are $\frac{n}{2}$ acceptable outputs for this problem. This makes the hidden matching problem not a function, but a {\em relation}. A separation for relations does not necessarily prove a separation for functions.
 
         \subsection{$\alpha$-Matching}
 
@@ -469,9 +471,19 @@
     \section{Conclusion}
     \label{sec:conclusion}
 
+        Communication complexity has proven itself to be a powerful tool for analysis of many subjects within theoretical computer science, from its origins in distributed computation to lower bounds in the circuit depth and streaming models as well as applications in cryptography. Alongside these classical achievements, it has also proven over the last two and a half decades to be a useful model for finding separations between classical and quantum computing.
+
+        We have presented in this report some of the one-way communication problems for which the communication of classical bits is significantly worse than the communication of quantum bits. In particular, we have highlighted some of the achievements made in finding gaps between classical and quantum communication for partial functions and total relations.
+
+        It is important to note that a number of other grand separations have also been proven which we have not been able to cover in this essay. Gavinsky \cite{gavinsky2008classical} showed a relation which could be solved in a logarithmic amount of one-way quantum communication, but required polynomial bits of classical communication, even if the communication was two-way and randomised. Regev and Klartag \cite{Regev:2011:QOC:1993636.1993642} later showed that this holds even for partial functions.
+
         \subsection{Open Problems}
 
-        \subsection{Other Areas}
+        Alas, for all the successes we have seen in one-way communication complexity, there is still the open problem of finding a total function for which there exists an advantage for quantum communication. Such an advantage would ideally be exponential, as a polynomial gap could offer little use in practice due to the ability to send classical bits at less of a cost \cite{RevModPhys.82.665}. But even finding a polynomial gap has proven to be a challenge.
+
+        Aaronson and LeGall have made considerable headway towards finding a subgroup which cannot be solvable in $O(\log |G|)$ bits of communication, and conjecture that such a subgroup does exist \cite{0902.3175}. Indeed, Aaronson in 2010 deemed the problem to be one of his Ten Semi-Grand Challenges for Quantum Computing Theory\footnote{\url{http://www.scottaaronson.com/blog/?p=471}}.
+
+        While the hidden subgroup problem might prove useful as a total function with a gap for one-way communication, there is a trivial $O(\log|G|)$ protocol in two-way classical communication: Bob sends $g$ to Alice who then checks if $g \in H$ and sends back $0$ or $1$ depending on the result. Thus we would still need a different problem in order to show even a polynomial separation for a total function between two-way randomised communication and one-way quantum communication.
 
     \bibliographystyle{alpha}
     \bibliography{quantum_communication_complexity}{}
@@ -493,5 +505,25 @@
             \caption{Plot of lower bounds of Distributed Deutsch-Jozsa for $n \in \{2, 4,..., 998, 1000\}$}
             \label{fig:ddj-bound}
         \end{figure}
+
+    \section{Other Models}
+
+        While we have focused on one-way communication complexity and a little bit of two-way communication during the conclusion, there are a number of other communication models who have been considered before. Some of these are briefly summarised below.
+
+        \subsection{Zero Communication Complexity}
+
+        Also known as 'spooky communication complexity' \cite{quant-ph/0101005}, this is the study of distributed computation problems which can be solved using only entangled qubits, without any communication whatsoever. Complexity is measured in the number of entangled pairs that have been used during computation. Much like how Holevo's theorem limits strengths of quantum communication, Alice and Bob are limited by the non-signalling properties of entanglement.
+
+        Zero communication complexity is strongly related to non-locality \cite{RevModPhys.82.665}. There have been a number of quantum communication problems shown to be solvable in this model of computation as well, including both the Distributed Deutsch-Jozsa problem and the Hidden Matching problem. The protocols have also been used to prove lower bounds on information complexity: If there is a protocol for computing a function with information complexity $I$, there is also a zero communication protocol for computing the same function such that the function has probability greater than $2^{-O(I)}$ of not aborting, and the protocol has high probability of succeeding on condition of it not aborting \cite{Kerenidis:2012:LBI:2417500.2417819}.
+
+        \subsection{Simultaneous Message Passing}
+
+        In the Simultaneous Message Passing model, Alice and Bob are given inputs $x$ and $y$, respectively, and send messages one-way to a third player called the Referee without any communication between each other. The Referee must then output $f(x, y)$ for some function $f$. Another way of picturing this model is if Alice and Bob sent a single message to each other at exactly the same time, so that one party could not have received the other parties message before sending theirs, and then for both players to output the same result $f(x, y)$.
+
+        It is already established that total functions are exponentially separated in this model: Newman and Szegedy \cite{Newman:1996:PVP:237814.238004} proved that equality of two $n$-bit strings in this model required $O(\sqrt{n})$ bits of communication. On the other hand, Buhrman et al.~\cite{PhysRevLett.87.167902} showed that the same problem in this model could be solved in $O(\log n)$ qubits of communication. It was also shown by Gavinsky et al.~\cite{Gavinsky:2007:ESO:1250790.1250866} that $\alpha$-Matching can be solved in the Simultaneous Message Passing model using $O(\log n)$ qubits of communication.
+
+        \subsection{Non-Local Boxes}
+
+        Non-local boxes act as a similar resource to entanglement, where Alice and Bob are each given a black box. If Alice inputs a bit $x$ into her box, and Bob inputs a bit $y$ into his box, then Alice will get bit $a$ and Bob will get bit $b$, subject to the rule that $x \wedge y = a \oplus b$. They were first proposed by Rohrlich and Popescu \cite{quant-ph/9508009} to see what a maximally non-local experiment would look like. Since then, several properties have been proven and summarised by Buhrman et al.~\cite{RevModPhys.82.665}. Of particular note, it was shown by van Dam \cite{Dam2012} that the existence of non-local boxes would mean that all distributed computation could be performed using a single bit of communication between parties.
 
 \end{document}
