@@ -2,6 +2,7 @@
 
 \usepackage{amsfonts}
 \usepackage{amsmath}
+\usepackage{amsthm}
 \usepackage[affil-it]{authblk}
 \usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
@@ -18,6 +19,8 @@
 
 \DeclareGraphicsExtensions{.pdf}
 
+\newtheorem{theorem}{Theorem}[section]
+
 \begin{document}
     \title{One-Way Quantum Communication Complexity}
     \author{Dominic Moylett\thanks{\texttt{\href{dominic.moylett@bristol.ac.uk}{dominic.moylett@bristol.ac.uk}}}}
@@ -25,48 +28,22 @@
     \date{\today}
     \maketitle
 
-    \begin{abstract}
-        Communication complexity is the study of how much information two or more parties need to share with each other in order to perform joint computation of a problem. There are many benefits to this model of computation, from many lower bound proofs to applications in cryptography, circuit complexity and data streaming. In this essay we will study the area of one-way communication complexity. We will explore the major achievements and summarising problems for which we have found -- or believe there to be -- a significant gap between what is possible in quantum communication and what is possible in classical communication. We conclude by summarising these results as well as open problems.
-    \end{abstract}
-
     \section{Introduction}
 
-        Ever since the idea of quantum computing was first suggested, one of the most important questions in the area was what advantages would a quantum computer have over classical computers? In the decades that followed, quantum computers showed theoretical benefits in many ways, from factoring integers and solving discrete logarithms \cite{Shor:1997:PAP:264393.264406} to searching unstructed data Grover \cite{Grover:1996:FQM:237814.237866} and even solving linear sets of equations \cite{PhysRevLett.103.150502}. Given that quantum computers have shown such advantages for a single computer setting, a natural question that then arises is can they show any advantages in a multiple party setting?
+        Ever since the idea of quantum computing was first suggested, one of the most important questions in the area was what advantages would a quantum computer have over classical computers? In the decades that followed, quantum computers have shown many benefits, from factoring integers \cite{Shor:1997:PAP:264393.264406} to searching data \cite{Grover:1996:FQM:237814.237866}. Given that quantum computers have shown such advantages for a single computer setting, a natural question is can they show advantages in distributed computation?
 
-        Evaluating the performance of multi-party quantum computation can be achieved via the study of communication complexity. Communication complexity is a very powerful model -- enough to be one of the reasons its creator earned the first ever Donald E. Knuth Prize in Computer Science\footnote{\url{http://www.sigact.org/Prizes/Knuth/1996.html}.} -- and has proven useful for proving lower bounds in a wide variety of models. It has also led to applications in different forms of computation, from secure multi-party computation to data streaming. Finding separations is not easy however, and Holevo's theorem has from the very start shown us that there will be many problems which simply cannot be solved more efficiently by parties communicating qubits instead of classical bits.
+        We can evaluate the advantage of distributed quantum computation via communication complexity. Communication complexity is a very powerful model -- enough to earn its creator the first Knuth Prize \footnote{\url{http://www.sigact.org/Prizes/Knuth/1996.html}.} -- and has proven lower bounds in a wide variety of models. It has also led to applications in different forms of computation, from secure multi-party computation to data streaming. But finding separations is not easy, and Holevo's theorem has from the beginning shown us that there are problems which cannot be solved more efficiently via quantum communication.
 
-        We will explore this topic in this report, focusing specifically on one-way communication complexity, and the significant achievements in trying to find separations between classical and quantum communication. Section~\ref{sec:cc} offers a brief overview of classical and quantum communication complexity, and an explanation of Holevo's theorem. Section~\ref{sec:separations} provides examples of problems for which it is either proven or conjectured to be a separation between quantum and classical communication. We conclude in Section~\ref{sec:conclusion} with a summary of the results and some open questions.
+        We will explore communication complexity in this report, focusing specifically on quantum advantages in the one-way communication setting. Section~\ref{sec:cc} offers a brief overview of communication complexity, and an explanation of Holevo's theorem. Section~\ref{sec:separations} provides examples of problems for which a separation between quantum and classical communication is either proven or conjectured. We conclude in Section~\ref{sec:conclusion} with a summary of the results and some open questions.
 
     \section{Communication Complexity}
     \label{sec:cc}
 
-        Communication complexity was developed by Yao in 1979 as an analysis of distributed computing \cite{Yao:1979:CQR:800135.804414}. Under this model of computation, our computation is done between two parties, commonly referred to as Alice and Bob, with inputs $x, y \in \{0, 1\}^n$, respectively. The two parties do not know each other's inputs; Alice does not know $y$ and Bob does not know $x$. Alice and Bob then exchange a series of messages between each other through a protocol established before computation, with their aim being to jointly compute $f(x, y)$. The question communication complexity asks is how many bits of information do Alice and Bob need to communicate in order for the two of them to compute a solution. We offer a sketch of a typical communication complexity problem in Figure~\ref{fig:cc}.
+        Communication complexity was developed by Yao in 1979 as an analysis of distributed computing \cite{Yao:1979:CQR:800135.804414}. Under this model, our computation is done between two parties, commonly referred to as Alice and Bob, with inputs $x, y \in \{0, 1\}^n$, respectively. The two parties do not know each other's inputs; Alice does not know $y$ and Bob does not know $x$. Alice and Bob then exchange a series of messages between each other through a known protocol, with their aim being to jointly compute $f(x, y)$. The question communication complexity asks is how many bits of information do Alice and Bob need to communicate in order for them. We offer a sketch of a typical communication complexity problem in Figure~\ref{fig:cc}.
 
-        A na\"{i}ve solution to any communication complexity problem can be completed using $n$ bits of communication: Alice sends $x$ to Bob and Bob then does all of the computation for $f(x, y)$. So the question then becomes if it is possible to compute $f(x, y)$ with $o(n)$ bits of communication.
+        A na\"{i}ve solution to any communication complexity problem uses $n$ bits of communication: Alice sends $x$ to Bob and Bob computes $f(x, y)$, possibly sending the result back to Alice. So the question then becomes if it is possible to compute $f(x, y)$ with $o(n)$ bits of communication.
 
-        One of the key benefits to communication complexity is that it is a useful model to prove lower bounds for, and there are a number of established techniques for doing so. For example, deterministic lower bounds can be proven by denoting the problem as a table and breaking it up into rectangles such that each rectangle covers the same output. The problem table for equality of three-bit strings for example is shown in Table~\ref{tab:eq}. Another technique for randomised communication complexity is to evaluate the problem as probability distributions, and show that the distributions which lead to either output become indistinguishable either from each other or from the normal distribution.
-
-        Although communication complexity was originally developed as a model to analyse distributed computing, a number of other applications have been found as well. Lower bounds and gaps shown in communication complexity have led to similar lower bounds in the data streaming model of computation\footnote{See \cite{TCS-002} for an explanation of the data streaming model.} such as in \cite{Gavinsky:2007:ESO:1250790.1250866} \& \cite{Verbin:2011:SCC:2133036.2133038}, as well as lower bounds for both quantum and classical circuits \cite{MSC:4265920, 366852}. Beyond the computation of lower bounds, other applications to communication complexity include classical security \cite{Gavinsky:2007:ESO:1250790.1250866} and secure multiparty computation in both classical and quantum settings \cite{Franklin:1992:CCS:129712.129780, Data2014, 1409.8488}.
-
-        \begin{table}
-            \begin{center}
-                \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
-                    \hline
-                    \multicolumn{2}{|c|}{}&\multicolumn{8}{|c|}{Bob's Input}\\\cline{3-10}
-                    \multicolumn{2}{|c|}{}& 000 & 001 & 010 & 011 & 100 & 101 & 110 & 111\\\hline
-                    \multirow{8}{*}{Alice's Input} & 000 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\\cline{2-10}
-                    & 001 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\\cline{2-10}
-                    & 010 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\\cline{2-10}
-                    & 011 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\\cline{2-10}
-                    & 100 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\\cline{2-10}
-                    & 101 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\\cline{2-10}
-                    & 110 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\\cline{2-10}
-                    & 111 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\\hline
-                \end{tabular}
-            \end{center}
-            \caption{The problem table for equality, with Alice's input along the side and Bob's input along the top.}
-            \label{tab:eq}
-        \end{table}
+        One of the key benefits to communication complexity is that it is a useful model to prove lower bounds for, and there are a number of established techniques for doing so. Lower bounds in communication complexity have also led to bounds in the data streaming model of computation\footnote{See \cite{TCS-002} for an explanation of the data streaming model.} such as in \cite{Gavinsky:2007:ESO:1250790.1250866} \& \cite{Verbin:2011:SCC:2133036.2133038}, as well as lower bounds for quantum and classical circuit depth \cite{MSC:4265920, 366852}. Beyond the computation of lower bounds, other applications to communication complexity include classical security \cite{Gavinsky:2007:ESO:1250790.1250866} and secure multiparty computation in both classical and quantum settings \cite{Franklin:1992:CCS:129712.129780, Data2014, 1409.8488}.
 
         \begin{figure}
             \centering
@@ -88,19 +65,9 @@
             \label{fig:cc}
         \end{figure}
 
-        \subsection{Quantum Communication Complexity}
-
-        In quantum communication complexity, first proposed in 1993 by Yao \cite{366852}, we also have parties Alice and Bob given inputs $x$ and $y$, respectively, and have to produce $f(x, y)$ for some function $f$. But now our two parties can send quantum messages between each other, and the complexity is measured in the number of qubits that are communicated.
-
-        Another model by Burhman and Cleve \cite{quant-ph/9704026} does not use the physical sending of data between the parties, but instead uses the measurement of entangled particles for remote computation. Our focus for this report however will be on the former. Note that it is possible to simulate this model by the ability to communicate quantum states: Alice generates entangled pairs of qubits and sends one of the pair to Bob. Likewise, it is possible to simulate communicating $l$ qubits by use of $l$ entangled pairs and $2l$ classical bits of communication, via quantum teleportation \cite{PhysRevLett.70.1895}.
-
-        Because of the well-established techniques for lower-bounding classical communication complexity, a common area of research is to see if there are any problems which quantum protocols can solve by communicating fewer qubits than the number of classical bits stated in known lower bounds. Finding quantum protocols that beat classical lower bounds can give us intuition on the gap between quantum and classical communication, for both communication complexity and other models, such as those mentioned in Section~\ref{sec:cc}.
-
         \subsection{One-Way Communication Complexity}
 
-        A specific subset of communication complexity, which we will focus on throughout this report, is one-way communication complexity. In this model of computation, Alice and Bob again receive respective inputs $x, y \in \{0, 1\}^n$ with the aim of Bob being able to output $f(x, y)$ for some function $f$. The difference now is that only one message is allowed to be sent, from Alice to Bob. This is illustrated in \ref{fig:ow-cc}.
-
-        Like general communication complexity, one-way communication complexity can also be solved na\"{i}vely in $n$ bits of communication by Alice sending $x$ to Bob. So once again, our question is if we can do better with less communication.
+        In one-way communication complexity, Alice and Bob again receive respective inputs $x, y \in \{0, 1\}^n$ with the aim being for Bob to output $f(x, y)$ for some function $f$. The difference now is that only one message is allowed to be sent from Alice to Bob, and Bob cannot send any messages to Alice. This is illustrated in \ref{fig:ow-cc}.
 
         \begin{figure}
             \centering
@@ -120,9 +87,17 @@
             \label{fig:ow-cc}
         \end{figure}
 
+        \subsection{Quantum Communication Complexity}
+
+        In quantum communication complexity, first proposed in 1993 by Yao \cite{366852}, we also have parties Alice and Bob given inputs $x$ and $y$, respectively, and have to produce $f(x, y)$ for some function $f$. But now our two parties can send quantum messages between each other, and the complexity is measured in the number of qubits that are communicated.
+
+        Another model by Burhman and Cleve \cite{PhysRevA.56.1201} does not use the physical sending of data between the parties, but instead uses the measurement of entangled particles for remote computation. While our focus for this report however will be on the former, it is possible to simulate communicating $l$ individual qubits by use of $l$ entangled pairs and $2l$ classical bits of communication, via quantum teleportation \cite{PhysRevLett.70.1895}. Likewise, it is possible to simulate this model by the ability to communicate quantum states: Alice generates entangled pairs of qubits and sends one of the pair to Bob.
+
+        Because of the well-established techniques for lower-bounding classical communication complexity, a common area of research is to see if there are any problems which quantum protocols can solve by communicating fewer qubits than the number of classical bits stated in known lower bounds. Finding quantum protocols that beat classical lower bounds can give us intuition on the difference between quantum and classical encoding of data. These protocols will be the focus of Section~\ref{sec:cc}.
+
         \subsection{Holevo's Theorem}
 
-        Even before Yao's work on the formalisation of Communication Complexity, it was clear that quantum communication would not be able to speed up some problems. In particular, a result by Holevo \cite{Hol73} gave an upper limit on the amount of information that can be extracted from a quantum state. A consequence of Holevo's theorem was that while a message of $n$ bits could be compressed into a message of at most $n-1$ qubits, the same message could not be retrieved from said qubits. We phrase this as a one-way communication complexity problem below.
+        Even before Yao's work on the formalisation of Communication Complexity, it was clear that quantum communication would not be able to speed up some problems. A result by Holevo \cite{Hol73} gave an upper limit on the amount of information that can be extracted from a quantum state. A consequence of Holevo's theorem was that while a message of $n$ bits could be compressed into a message of less than $n$ qubits, the same message could not be retrieved from said qubits with absolute certainty. We phrase this as a communication complexity problem below.
 
         \begin{codebox}
             \Procname{Problem $\proc{COMMUNICATION}$}
@@ -131,23 +106,16 @@
             \zi \const{Bob's output:} $x$.
         \end{codebox}
 
-        By Holevo's theorem, we know that the above problem requires Alice to send $\Omega(n)$ qubits to Bob. A later proof by Nayak \cite{814608} explains this result explicitly for encoding classical data in quantum data, showing that if we compress a message of $n$ bits into a message of $m < n$ qubits, the probability that we can successfully retrieve all $n$ bits again is at most $2^{m-n}$.
+        \begin{theorem}
+            \label{thm:nayak}
+            Any quantum protocol for COMMUNICATION that uses $O(2^m)$ bits of quantum communication succeeds with probability at most $2^{m-n}$.
+        \end{theorem}
 
-        Nayak's proof is as follows: Suppose we create an encoding $x \mapsto \{q_{x,i}|\phi_{x_i}\rangle\}$ such that $x$ is an $n$-bit string and $\{q_{x,i}|\phi_{x_i}\rangle\}$ is a mixed state over $m$ qubits. We decode this message by measuring over projection operators $\{P_x\}$. The mean probability of Bob successfully decoding an $x$ that has been selected uniformly at random is $2^{-n}\sum_{x, i}q_{x, i}\|P_x|\phi_{x,i}\rangle\|^2$. This can be bounded by making our states pure and setting $|\phi_x\rangle = \max_{|\psi_{x, i}\rangle}\|P_x|\phi_{x, i}\rangle\|^2$:
+        We can proove Theorem~\ref{thm:nayak} by Holevo's theorem, but a later proof by Nayak \cite{814608} explains this result explicitly for encoding classical data in quantum data. This proof is given in Appendix~\ref{sec:nayak}.
 
-        $$\frac{1}{2^n}\sum_{x, i}q_{x, i}\|P_x|\phi_{x,i}\rangle\|^2 \leq \frac{1}{2^n}\sum_{x}\|P_x|\phi_{x}\rangle\|^2$$
+        The only exception to this is if Alice and Bob have shared entangled qubits between each other prior to computation, in which case superdense coding can be used to communicate two bits by physically sending one qubit \cite{PhysRevLett.69.2881}. On the other hand, if Alice and Bob share prior entanglement and can communicate classically, they can communicate single qubits by physically sending pairs of bits \cite{PhysRevLett.70.1895}, so we can only save at most a factor of $1/2$ \cite{quant-ph/0101005}.
 
-        Next, we decompose $P_x$ into an orthonormal basis $\{|\hat{e}_{x, j}\rangle\}$ and create a subspace $E$ that spans the code words $\{|\phi_x\rangle\}$ with projection $Q$:
-
-        $$\frac{1}{2^n}\sum_{x}\|P_x|\phi_{x}\rangle\|^2 = \frac{1}{2^n}\sum_{x, j}\langle\phi_x|\hat{e}_{x, j}\rangle\langle\hat{e}_{x, j}|\phi_x\rangle \leq \frac{1}{2^n}\sum_{x}\|Q|\hat{e}_{x, j}\rangle\|^2$$
-
-        Finally, we decompose $Q = \sum_i|e_i\rangle\langle e_i|$ where $\{|e_i\rangle\}$ is an orthonormal basis spanning $E$. Note that since $|\phi_x\rangle$ is conveyed in at most $m$ qubits, $|\{|e_i\rangle\}| \leq 2^m$. Hence we conclude that
-
-        $$\frac{1}{2^n}\sum_{x, j}\|Q|\hat{e}_{x, j}\rangle\|^2 \leq \frac{1}{2^n}\sum_{x, j, i}|\langle e_i|e_{x, j}\rangle|^2 \leq \frac{1}{2^n}\sum_{i}|\langle e_i|e_i\rangle|^2 \leq 2^{m - n}.$$
-
-        As a result, if Alice sends fewer qubits to Bob, the probability of them successfully communicating a classical message decreases exponentially, and the only case where they succeed all of the time is when $m = n$. The only exception to this is when Alice and Bob have shared entangled qubits between each other prior to computation, in which case superdense coding can be used to send two bits by sending one qubit \cite{PhysRevLett.69.2881}. Brassard \cite{quant-ph/0101005} explains that if we have unlimited entanglement between Alice and Bob then we can only at most reduce the amount of communication by a factor of $1/2$, as quantum teleportation can be used to send qubits from one party to the other using entangled pairs and communicating with classical bits \cite{PhysRevLett.70.1895}.
-
-        Holevo's Theorem has in turn led to communication complexity problems which cannot be solved more efficiently with quantum communication. One example of this is the Inner Product problem, studied in \cite{Cleve201311}:
+        Holevo's Theorem has in turn led to communication complexity problems which cannot be solved more efficiently with quantum communication. One example of this is the Inner Product problem:
 
         \begin{codebox}
             \Procname{Problem $\proc{INNER-PRODUCT}$}
@@ -156,7 +124,7 @@
             \zi \const{Bob's output:} $\sum_{i = 0}^{n - 1}x_i.y_i (\textrm{mod} 2)$.
         \end{codebox}
 
-        Cleve et al.~showed that if we were able to solve this problem in less than $O(n)$ qubits of communication, then it would be possible for Alice to communicate $x$ to Bob in $o(n)$ qubits, thus violating Holevo's theorem. A summary of this proof is given in \cite{RevModPhys.82.665}.
+        Cleve et al.~\cite{Cleve201311} showed that if we were able to solve this problem in less than $O(n)$ qubits of communication, then it would be possible for Alice to communicate $x$ to Bob in $o(n)$ qubits, thus violating Holevo's theorem.
 
     \section{Separations Between Quantum and Classical Communication Complexity}
     \label{sec:separations}
@@ -165,13 +133,13 @@
 
         \subsection{Distributed Deutsch-Jozsa}
 
-        The Distributed Deutsch-Jozsa problem, first introduced by Buhrman, Cleve and Wigderson \cite{Buhrman:1998:QVC:276698.276713}, was the first example of an exponential separation between quantum and classical computation complexity. Prior to this, the largest gaps between classical and quantum communication were constant factors \cite{quant-ph/9704026}. The problem, and its quantum protocol as described in Buhrman et al.~\cite{RevModPhys.82.665}, are stated as follows, where $\mathcal{D}(x, y)$ is the Hamming distance between $x$ and $y$ and $U_x = \sum_{i=0}^{n-1}(-1)^{x_i}|i\rangle\langle i|$ for $x \in {0, 1}^n$:
+        The Distributed Deutsch-Jozsa problem, first introduced by Buhrman, Cleve and Wigderson \cite{Buhrman:1998:QVC:276698.276713}, was the first example of an exponential separation between quantum and classical computation complexity. Prior to this, the largest gaps between classical and quantum communication were constant factors \cite{PhysRevA.56.1201}. The problem, and its quantum protocol as described in Buhrman et al.~\cite{RevModPhys.82.665}, are stated as follows, where $d(x, y)$ is the Hamming distance between $x$ and $y$ and $U_x = \sum_{i=0}^{n-1}(-1)^{x_i}|i\rangle\langle i|$ for $x \in {0, 1}^n$:
 
         \begin{codebox}
             \Procname{Protocol $\proc{DISTRIBUTED DEUTSCH-JOZSA}$}
             \zi \const{Alice's input:} $x \in \{0, 1\}^n$.
             \zi \const{Bob's input:} $y \in \{0, 1\}^n$.
-            \zi \const{Promise:} $x = y$ or $\mathcal{D}(x, y) = n/2$.
+            \zi \const{Promise:} $x = y$ or $d(x, y) = n/2$.
             \zi \const{Bob's output:} $0$ iff $x = y$, $1$ otherwise.
             \li Alice starts computation in the $|0\rangle^{\otimes \log n}$ state and applies $U_xH^{\otimes \log n}$ to get the state $|\psi\rangle$.
             \li Alice sends $|\psi\rangle$ to Bob.
@@ -182,34 +150,23 @@
 
         The state Alice sends to Bob is $|\psi\rangle = \frac{1}{\sqrt{n}}\sum_{i=0}^{n-1} (-1)^{x_i}|i\rangle$. When Bob applies $U_y$ to this state, they end up with the state $\frac{1}{\sqrt{n}}\sum_{i=0}^{n-1}(-1)^{x_i}(-1)^{y_i}|i\rangle$. We'll now consider this state for two situations: one where $x = y$ and one where they differ in $n/2$ places, denoted $|\psi_0\rangle$ and $|\psi_1\rangle$, respectively.
 
-        Note that if $x = y$ then $(-1)^{x_i}(-1)^{y_i} = 1$, so $|\psi_0\rangle = \frac{1}{\sqrt{n}}\sum_{i = 0}^{n-1}|i\rangle$. $|\psi_1\rangle$ on the other hand will have exactly $n/2$ amplitudes which are positive, and $n/2$ amplitudes which are negative. From this we can see that $\langle\psi_0|\psi_1\rangle = \frac{n/2 - n/2}{n} = 0$, so the states can be distinguished from one another upon measurement. Finally, Bob's application of $H^{\otimes \log n}$ converts their state to the computational basis. Note that $H|\psi_o\rangle = |0\rangle^{\otimes\log n}$, so measuring this state will indicate that $x = y$ and any other state will indicate that $\mathcal{D}(x, y) = n/2$.
+        Note that if $x = y$ then $(-1)^{x_i}(-1)^{y_i} = 1$, so $|\psi_0\rangle = \frac{1}{\sqrt{n}}\sum_{i = 0}^{n-1}|i\rangle$. $|\psi_1\rangle$ on the other hand will have exactly $n/2$ amplitudes which are positive, and $n/2$ amplitudes which are negative. From this we can see that $\langle\psi_0|\psi_1\rangle = \frac{n/2 - n/2}{n} = 0$, so the states can be distinguished from one another upon measurement. Finally, Bob's application of $H^{\otimes \log n}$ converts their state to the computational basis. Note that $H|\psi_o\rangle = |0\rangle^{\otimes\log n}$, so measuring this state will indicate that $x = y$ and any other state will indicate that $d(x, y) = n/2$.
 
-        So we have been able to deterministically solve this problem with $O(\log n)$ qubits of communication between Alice and Bob. How much classical communication is required to solve it? One common way of lower bounding deterministic communication protocols for a function $f$ is to partition the problem space up into rectangles $(a, b, c, d)$ such that $f(x_i, y_i) = f(x_i', y_i')$ for any pair of inputs $(x_i, y_i), (x_i', y_i') \in \{x_a,x_{a + 1},...,x_{b}\} \times \{y_c, y_{c+1},...,y_d\}$. We can lower bound the number of messages to $c$ bits if we need $2^c$ rectangles to cover the entire problem space.
+        So we have been able to deterministically solve this problem with $O(\log n)$ qubits of communication between Alice and Bob. How much classical communication is required to solve it? Buhrman et al.\cite{RevModPhys.82.665} used the work of Buhrman, Cleve and Wigderson \cite{Buhrman:1998:QVC:276698.276713} to give the following lower bound:
 
-        For this problem, we will focus on the inputs $(x, x)$, where $x$ is an $n$-bit string with hamming weight $n/2$. There are $\binom{n}{n/2} \approx 2^n/\sqrt{n}$ such inputs, which means that at least one rectangle $R$ must contain $2^{n-c}/\sqrt{n}$ of these inputs. Because $DDJ(x, x) = 0 ~\forall~x\in \{0, 1\}^n$, all $(x, y)$-pairs in $R$ must satisfy either $x = y$ to output $0$ or $\mathcal{D}(x, y) \neq n/2$ to break the promise. Characteristic analysis detailed in \cite{RevModPhys.82.665} show that the maximum number of $(x, x)$ inputs in $R$ is $1.99^n$ \cite{frankl1987forbidden}. Hence we have the inequality
+        \begin{theorem}
+            \label{thm:ddj}
+            The Distributed Deutsch-Jozsa Function requires $\Omega(n)$ bits of classical communication to be solved deterministically.
+        \end{theorem}
 
-        $$\frac{2^{n-c}}{\sqrt{n}} \leq 1.99^n$$
-
-        Solving for $c$ shows that $c \geq \log_2(2^n/1.99^n\sqrt{n}) = \Omega(0.007n)$. Note that Buhrman et al.~\cite{RevModPhys.82.665} provide this as a lower bound instead of an asymptotic lower bound, but this is only correct if $n \geq 728$. A plot of $\log_2(2^n/1.99^n\sqrt{n})/n$ for even values of $n$ ranging from $2$ to $998$ is given in Appendix \ref{sec:ddj-lower-bound}.
-
-        Thus we have an exponential gap between deterministic classical communication and quantum communication for the Distributed Deutsch-Jozsa problem. However, this quantum advantage is lost when compared to randomised classical computation for some positive integer $c$:
-
-        \begin{codebox}
-            \Procname{Protocol $\proc{DISTRIBUTED DEUTSCH-JOZSA}$}
-            \li Alice picks $c$ unique items $a \in \{0, 1\}^n$ uniformly at random.
-            \li Alice sends $(a_i, x_{a_i})~ \forall i \in \{0,...,c-1\}$.
-            \li Bob returns $0$ if $x_{a_i} = y_{a_i}~ \forall i \in \{0,...,c-1\}$, and $1$ otherwise.
-            \End
-        \end{codebox}
-
-        Bob always returns $0$ if $x = y$, so our protocol has no true negative results. If $\mathcal{D}(x, y) = n/2$, then the protocol fails if $x_{a_i} = y_{a_i} \forall i \in \{0,...,c-1\}$, which happens with probability $1/2^c$. Finally, note that each $a_i$ can be communicated in $\log n$ bits, so the overall communication required is $c(\log n + 1)$ bits.
+        A summary of this proof is in Appendix~\ref{sec:ddj-lower-bound}. Thus we have an exponential gap between deterministic classical communication and quantum communication for the Distributed Deutsch-Jozsa problem. However, this quantum advantage is lost when compared to randomised classical communication: Alice picks a random index $i \in \{0,...,n-1\}$ and sends $(i, x_i)$ to Bob, who outputs $0$ if $x_i = y_i$ and $1$ otherwise. This protocol has error $1/2$, which can be reduced by repetition. Overall communication is $O(\log n)$ bits.
 
         \subsection{Subgroup Membership}
         \label{sec:subgroup-membership}
 
-        One disadvantage of the Distributed Deutsch-Jozsa problem that we saw above is that a quantum protocol has no advantage over a randomised classical protocol. Another disadvantage is that the problem is a {\em partial function}, in that it requires a {\em promise} on the input: that either the two bit strings are identical or they differ in exactly $n/2$ places. This promise results in a very contrived problem with little practical application. This begs the question: Are there any functions which do not rely on promises that yield a quantum advantage under the communication complexity model -- better known as {\em total functions}?
+        Another disadvantage is that the Distributed Deutsch-Jozsa problem is a partial function, in that it requires a promise. This begs the question: Are there any functions which do not rely on promises -- better known as total functions -- but still have a quantum advantage?
 
-        Sadly, no significant gap has been shown for total functions in the one-way model, even though two-way communication has shown polynomial gaps \cite{Buhrman:1998:QVC:276698.276713}, and other models such as Simultaneous Message Passing have shown exponential gaps \cite{PhysRevLett.87.167902}. But there are some problems which have shown potential. Aaronson et al.~\cite{0902.3175} were the first to explore the problem of subgroup membership as potentially yielding a quantum advantage in the one-way comunication complexity setting. Their protocol for solving subgroup membership, based on an earlier quantum algorithm by Watrous \cite{Watrous:2000:SQP:795666.796590}, is described below, where $G$ is a group, $\mathscr{H}_G$ is the set of all subgroups of $G$, $|+\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)$ and $U_{G, y} = \sum_{g \in G}|yg\rangle\langle g|$ for some $y \in G$:
+        This is an open question, but some progress has been made. Aaronson et al.~\cite{0902.3175} explored the problem of subgroup membership as potentially yielding a quantum advantage for a total function. Their protocol for solving subgroup membership, based on an earlier quantum algorithm by Watrous \cite{Watrous:2000:SQP:795666.796590}, is described below, where $G$ is a group, $\mathscr{H}_G$ is the set of all subgroups of $G$, $|+\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)$ and $U_{G, y} = \sum_{g \in G}|yg\rangle\langle g|$ for some $y \in G$:
 
         \begin{codebox}
             \Procname{Protocol $\proc{SUBGROUP-MEMBERSHIP}$}
@@ -223,23 +180,27 @@
 
         Any element $h \in H$ can be described in $\lceil\log |G|\rceil$ bits, so Alice needs to send $O(\log |G|)$ qubits to Bob in order to perform this protocol.
 
-        After line 2, Bob has the state $\frac{1}{\sqrt{2}}(|H\rangle|0\rangle + |yH\rangle|1\rangle)$, where $|yH\rangle = \frac{1}{\sqrt{|H|}}\sum_{yh \in H}|h\rangle$. If $y \in H$ then $yh \in H~ \forall h \in H$, so $|yH\rangle = |H\rangle$. Therefore, if $y \in H$ then $U_{G, y}|H\rangle|+\rangle = |H\rangle|+\rangle$, so applying a Hadamard to the final qubit makes the final qubit $|0\rangle$. A measurement in the computational basis will thus always yield $0$.
+        After line 2, Bob has the state $\frac{1}{\sqrt{2}}(|H\rangle|0\rangle + |yH\rangle|1\rangle)$, where $|yH\rangle = \frac{1}{\sqrt{|H|}}\sum_{yh \in H}|h\rangle$. If $y \in H$ then $U_{G, y}|H\rangle|+\rangle = |H\rangle|+\rangle$, so applying a Hadamard to the final qubit makes the final qubit $|0\rangle$. A measurement in the computational basis will thus always yield $0$.
 
         On the other hand, if $y \notin H$ then $\langle yH|H\rangle = 0$, so applying the Hadamard produces
 
         $$\frac{1}{2}(|H\rangle|0\rangle + |H\rangle|1\rangle + |yH\rangle|0\rangle - |yH\rangle|1\rangle).$$
 
-        Measuring the final qubit will result in $|0\rangle$ -- and thus a false positive -- with probability $1/2$. We can repeat this protocol a constant number of times to get a negligible error probability.
+        Measuring the final qubit will result in $|0\rangle$ -- and thus a false positive -- with probability $1/2$. We can repeat this protocol to reduce this error.
 
-        Classically, it has been shown by Miltersen et al.~\cite{Miltersen199837} that any one-way randomised protocol with completeness probability of $1/2$ and perfect soundness must use $\Omega(\log|G|)$ bits of communication. Aaronson et al.~\cite{0902.3175} have conjectured that this bound still holds even if we relax soundness to $1/3$ and tighten completeness to $2/3$.
+        Classically, it has been shown by Miltersen et al.~\cite{Miltersen199837} that any one-way randomised protocol with completeness probability of $1/2$ and perfect soundness must use $\Omega(\log^2|G|)$ bits of communication. Aaronson et al.~ have conjectured that this bound still holds even in a bounded-error setting.
 
-        So, if we can find a total subgroup membership function that cannot classically be solved using $O(\log |G|)$ bits of communication, then we will have a polynomial gap between classical and quantum communication for a total function. The problem is that there are many subgroup membership problems which {\em can} be solved classically within these constraints. One example is that of normal subgroups. Aaronson et al.~\cite{0902.3175} showed that this problem can be solved with error probability of $1/2$ using only $O(\log |G|)$ bits of communication.
+        So, if we can find a total subgroup membership function that cannot classically be solved using $O(\log |G|)$ bits of communication, then we will have a quadratic gap for a total function. The problem is that there are many subgroups which can be solved classically. For example, Aaronson et al.~ gave the following theorem for normal subgroups:
 
-        To explain this classical protocol, we first need to describe complex characters. For any complex field representation $\rho$ of $G$, the complex character $\chi$ is the function $\chi(g) = \textrm{tr}(\rho(g))~\forall~g\in G$. For any two elements $g, g' \in G$, we have the relation that $\chi(gg'g^{-1}) = \chi(g)$. $\chi(1)$ is the dimension of $\rho$, and the kernel of $\chi$, denoted $\textrm{ker}(\chi) = \{g \in G|\chi(g) = chi(1)\}$. If $\rho$ is irreducible then $\chi$ is an irreducible character, and the set of irreducible complex characters of $G$ is denoted $\textrm{Char}(g)$. Finally, if $H$ is a normal subgroup of $G$, then let
+        \begin{theorem}
+            For normal subgroup $H \in \mathscr{H}_G, y \in G$ there is an $O(\log|G|)$ protocol which outputs with probability $1$ if $y \in H$ and $0$ with probability at least $1/2$ if $y \notin H$.
+        \end{theorem}
+
+        To explain this classical protocol, we first need to describe complex characters. For any complex field representation $\rho$ of $G$, the complex character $\chi$ is the function $\chi(g) = \textrm{tr}(\rho(g))~\forall~g\in G$. For any two elements $g, g' \in G$, we have the relation that $\chi(gg'g^{-1}) = \chi(g)$. $\chi(1)$ is the dimension of $\rho$, and the kernel of $\chi$, denoted $\textrm{ker}(\chi) = \{g \in G|\chi(g) = chi(1)\}$. If $\rho$ is irreducible then $\chi$ is an irreducible character, and the set of irreducible complex characters of $G$ is denoted $\textrm{Char}(g)$. If $H$ is a normal subgroup of $G$, then let
 
         $$\Lambda_H = \{\chi \in \textrm{G}|H\subseteq \textrm{ker}(\chi)\}.$$
 
-        Finally, given this definition we note that
+        Given this definition we note that
 
         $$\sum_{\chi \in \Lambda_H}[\chi(1)]^2 = \frac{|G|}{|H|}.$$
 
@@ -255,21 +216,23 @@
             \li Bob outputs $1$ if $y \in \textrm{ker}(\mu)$ and $0$ otherwise.
         \end{codebox}
 
-        If $y \in H$ then $y \in \textrm{ker}(\mu)$, so $\mu(y) = \mu(1)$ and thus the protocol will always correctly report a member of $H$. So now we only need to consider the case where the $y \notin H$ yet the protocol accepts. This will occur if Alice picks a character $\mu$ such that $y \in \textrm{ker}(\mu)$. We shall call the set of all characters that would cause an error $B$. Based on Alice's selection criteria, the probability of an error is thus
+        \begin{proof}[Proof of NORMAL-SUBGROUP-MEMBERSHIP]
+        If $y \in H \subseteq \textrm{ker}(\mu)$ then $\mu(y) = \mu(1)$ and thus the protocol will succeed. So the protocol fails if Alice picks a character $\mu$ such that $y \in \textrm{ker}(\mu) \setminus H$. We shall call the set of all characters that would cause an error $B$. Based on Alice's selection probability, the probability of an error is thus
 
         $$\frac{|H|}{|G|}\sum_{\chi \in B}[\chi(1)]^2.$$
 
-        To analyse this further, we will look at the smallest normal subgroup of $G$ which contains both $H$ and $y$. We will call this subgroup $K$, which can be stated formally as $K = \{gkg^{-1}|g \in G, k \in H \cup \{y\}\}$. Note that $|K| \geq 2|H|$, as $\forall~h\in H, h \in K$ and $hyh^{-1} \in K$, but $hyh^{-1} \notin H$.
+        To analyse this further, we will look at the smallest normal subgroup of $G$ which contains both $H$ and $y$. We will call this subgroup $K$, which can be stated formally as $K = \{gkg^{-1}|g \in G, k \in H \cup \{y\}\}$. Note that $|K| \geq 2|H|$, as $h \in K$ and $hyh^{-1} \in K$, but $hyh^{-1} \notin H ~\forall~h\in H$.
 
-        The final point we will need is that $B \subseteq \Lambda_K$. Consider a character $\chi \in B$. Because $\chi$ could be selected by Alice, we know that $H \subseteq \textrm{ker}(\chi)$, and also that $y \in \textrm{ker}(\chi)$ because $\chi \in B$. We can conclude from this that any other element in $K$ must also be in $\textrm{ker}(\chi)$, as $\chi(gkg^{-1}) = \chi(k)~\forall~g\in G, k\in H \cup \{y\}$. Thus $K \subseteq \textrm{ker}(\chi)$ and we can conclude that $\chi \in \Lambda_K$.
+        The final point we will need is that $B \subseteq \Lambda_K$. Consider a character $\chi \in B$. Because $\chi$ could be selected by Alice, we know that $H \subseteq \textrm{ker}(\chi)$. We also know that $y \in \textrm{ker}(\chi)$ because $\chi \in B$. We see from this that any other element in $K$ must also be in $\textrm{ker}(\chi)$, as $\chi(gkg^{-1}) = \chi(k)~\forall~g\in G, k\in H \cup \{y\}$. Thus $K \subseteq \textrm{ker}(\chi)$ and we can conclude that $\chi \in \Lambda_K$.
 
         Using the above points, we can show that
 
-        $$\frac{|H|}{|G|}\sum_{\chi \in B}[\chi(1)]^2 \leq \frac{|H|}{|G|}\sum_{\chi \in \Lambda_K}[\chi(1)]^2 = \frac{|H|}{|G|}\frac{|G|}{|K|} \leq \frac{|H|}{|G|}\frac{|G|}{2|K|} = \frac{1}{2}.$$
+        $$\frac{|H|}{|G|}\sum_{\chi \in B}[\chi(1)]^2 \leq \frac{|H|}{|G|}\sum_{\chi \in \Lambda_K}[\chi(1)]^2 = \frac{|H|}{|G|}\frac{|G|}{|K|} \leq \frac{|H|}{2|H|} = \frac{1}{2}.$$
 
-        Thus this protocol fails with probability at most $1/2$. Finally, we note that is is possible to describe a character $\mu$ sent from Alice to Bob in $\lceil\log|G|\rceil$ bits, as $\mu \in \Lambda_H$ and $|\lambda_H| \leq |Char(G)| \leq |G|$, so this protocol only needs $O(\log |G|)$ classical bits of communication.
+        Thus this protocol fails with probability at most $1/2$. Finally, we note that is is possible to describe $\mu$ in $\lceil\log|G|\rceil$ bits, as $\mu \in \Lambda_H$ and $|\lambda_H| \leq |Char(G)| \leq |G|$.
+        \end{proof}
 
-        Other groups also proven to be solvable in $(O\log|G|)$ bits of communication include groups with small modular or representations and groups with small complex representations. So already we have three examples of groups which we need to avoid in order to find a polynomial gap.
+        Other groups also proven to be solvable in $(O\log|G|)$ bits of communication include groups with small modular or representations and groups with small complex representations. So already we have three cases of groups which don't have a separation.
 
         \subsection{Hidden Matching}
         \label{sec:hidden-matching}
@@ -290,31 +253,26 @@
             \li Bob returns $(i, j, b)$, where $b = 0$ if $|\psi_{i\pm j}\rangle = \frac{\pm 1}{\sqrt{2}}(|i\rangle+|j\rangle)$ and $b = 1$ if $|\psi_{i\pm j}\rangle = \frac{\pm 1}{\sqrt{2}}(|i\rangle-|j\rangle)$.
         \end{codebox}
 
-        First, note that since $M$ is a perfect matching, each index $i \in \{0,...,n-1\}$ occurs in exactly one $(i, j)$-pair in $M$. Thus the inner product of any two different states in the basis in step 2 of the above protocol is
-
-        $$\langle\psi_{i\pm j}|\psi_{i'\pm j'}\rangle = \frac{\langle i|i'\rangle \pm \langle i|j'\rangle \pm \langle j|i'\rangle \pm \langle j|j'\rangle}{2} = 0$$
-
-        The only exception is comparing the states $|\psi_{i + j}\rangle$ and $|\psi_{i - j}\rangle$, where:
-
-        $$\langle\psi_{i + j}|\psi_{i - j}\rangle = \frac{\langle i|i\rangle - \langle j|j\rangle}{2} = 0$$
-
-        Hence this basis is orthogonal and can be measured. The probability of measuring $|\psi_{i \pm j}\rangle$ is
+        First, note that since $M$ is a perfect matching, each index $i \in \{0,...,n-1\}$ occurs in exactly one $(i, j)$-pair in $M$. Thus the basis of step $2$ is orthonormal and can be measured. The probability of measuring $|\psi_{i \pm j}\rangle$ is
 
         $$P(i\pm j) = \left|\frac{1}{\sqrt{n}}\sum_{k=0}^{n-1}(-1)^{x_k}\frac{1}{\sqrt{2}}(|i\rangle \pm |j\rangle)\right|^2 = \frac{|(-1)^{x_i} \pm (-1)^{x_j}|^2}{2n}$$.
 
-        Note that if $x_i \oplus x_j = 0$ then $x_i = x_j$, so $P(i-j) = \frac{1}{2n}(1-1) = 0$ and thus Bob will only measure the state $|\psi_{i+j}\rangle$. Likewise, if $x_i \oplus x_j = 1$ then $P(i+j) = \frac{1}{2n}(1-1) = 0$, so Bob will only measure the state $|\psi_{i-j}\rangle$. Thus this quantum protocol will always succeed at finding a matching pair, though the specific pair found occurs with probability $\frac{1}{2n}$.
+        If $x_i \oplus x_j = 0$ then $x_i = x_j$, so $P(i-j) = \frac{1}{2n}(1-1) = 0$ and thus Bob will measure the state $|\psi_{i+j}\rangle$. Likewise, if $x_i \oplus x_j = 1$ then Bob will measure the state $|\psi_{i-j}\rangle$. Thus this quantum protocol will always find a pair, though a specific pair has probability $\frac{1}{2n}$.
 
-        As for classical one-way protocols, it was shown in \cite{doi:10.1137/060651835} that a random one-way protocol needs $\Omega(\sqrt{n})$ bits of communication, thus providing an exponential gap. Furthermore, this bound is known to be tight if public random bits are shared between Alice and Bob, as Alice can send $O(\sqrt{n})$ bits $x_i$, where $i$ is chosen from the random string. By the birthday paradox, the expected probability that a pair of indices were in Bob's matching is $1$.
+        As for classical one-way protocols, the following theorem was proven in \cite{doi:10.1137/060651835}:
 
-        Take any protocol for computing the Hidden Matching Problem with mean probability of failure $\delta$ across Alice and Bob's input. If we pick a certain input for Alice $x$, we will denote the probability of error given $x$ as $\hat{e}_x$. By Markov's inequality, $Pr[\hat{e}_x \geq 2\delta] \leq \mathbb{E}[\hat{e}_x]/2\delta = \delta/2\delta = 1/2$, so at most half of Alice's inputs can fail more than $\delta/2$ of the time.
+        \begin{theorem}
+            \label{thm:hm}
+            A random one-way protocol for the Hidden Matching problem with deterministic Alice requires $O(\sqrt{n})$ bits of communication.
+        \end{theorem}
 
-        Assuming Alice's message to Bob is written deterministically, we define the set of Alice's inputs that map to a message $\tau$ and have error less than $2\delta$ as $S_{\tau}$. Note that $\sum_{\tau}S_{\tau}$ is equal to the number of Alice's inputs with error less than $2\delta$. Using Markov's inequality above, this sum must be greater than $2^{n-1}$. Bar-Yossef et al.~ then showed that for any message $\tau$, the size of the set $S_{\tau}$ is at most $2^{\Omega(n - \sqrt{n})}$. Combining these two inequalities, the number of unique messages Alice could send to Bob is at least $2^{n - 1}/2^{n - \Omega(\sqrt{n})} = 2^{\Omega(\sqrt{n}) - 1} = 2^{\Omega(\sqrt{n})}$. Assuming Alice's input is chosen uniformly at random, the length of each message must be at least $\Omega(\sqrt{n})$ classical bits.
+         This proof is summarised in Appendix~\ref{sec:hm-lower-bound}.
 
-        So have we now found an example of a total function that separates quantum and classical one-way communication complexity? Alas, we have not. This is because a function has a one-to-one mapping from inputs to outputs. But the hidden matching problem has a one-to-many mapping; Bob is allowed to output any $(i, j, x_i \oplus x_j)$ tuple under the condition that $(i, j) \in M$, thus there are $\frac{n}{2}$ acceptable outputs for this problem. This makes the hidden matching problem not a function, but a {\em relation}. A separation for relations does not necessarily prove a separation for functions.
+        Unfortunately, this is not an example of a total function that separates quantum and classical one-way communication complexity. This is because the hidden matching problem has a one-to-many mapping: Bob is allowed to output any $(i, j, x_i \oplus x_j)$ tuple under the condition that $(i, j) \in M$, thus there are $n/2$ acceptable outputs. This makes the hidden matching problem not a function, but a relation. A separation for relations does not necessarily prove a separation for functions.
 
         \subsection{$\alpha$-Matching}
 
-        $\alpha$-matching is a promise function related to the hidden matching problem described earlier. It was first studied for one-way communication complexity by Gavinsky et al.~\cite{Gavinsky:2007:ESO:1250790.1250866}. In $\alpha$-matching, the matching given to Bob consists of $\alpha n$ pairs for, such that no index occurs in more than one pair. If $\alpha = 1/2$ then the matching is perfect like before, and if $\alpha < 1/2$ then the matching is partial. The problem and its quantum protocol are described as follows, where $\mathcal{M}_{\alpha n}$ is the set of all $\alpha$-matchings, and $\bar{x}$ is the bitwise NOT of the string $x$:
+        $\alpha$-Matching is a promise function related to the hidden matching problem. In $\alpha$-matching, the matching given to Bob consists of $\alpha n$ disjoint pairs. If $\alpha = 1/2$ then the matching is perfect like before, and if $\alpha < 1/2$ then the matching is partial. The problem and its quantum protocol from \cite{Gavinsky:2007:ESO:1250790.1250866} are described as follows, where $\mathcal{M}_{\alpha n}$ is the set of all $\alpha$-matchings, and $\bar{x}$ is the bitwise NOT of the string $x$:
 
         \begin{codebox}
             \Procname{Protocol $\proc{$\alpha$-MATCHING}$}
@@ -322,19 +280,26 @@
             \zi \const{Bob's input}: $M \in \mathcal{M}_{\alpha n}, w \in \{0, 1\}^{\alpha n}$.
             \zi \const{Promise}: $w = Mx$ or $\bar{w} = Mx$.
             \zi \const{Bob's output}: $0$ if $w = Mx$, $1$ otherwise.
-            \li Bob adds $(i, j)$ pairs to their matching to get a perfect matching $M'$.
-            \li Alice and Bob engage in the protocol for Hidden Matching on $(x, M')$ to get tuple $(i, j, x_i \oplus x_j)$
-            \li If $(i, j) \notin M$ then Bob aborts. Otherwise let $(Mx)_k = x_i \oplus x_j$.
-            \li Bob outputs $0$ if $w_k = (Mx)_k$ and $1$ otherwise.
+            \li Bob adds $(i, j)$ pairs to their matching to get perfect matching $M'$.
+            \li Alice and Bob run the Hidden Matching on $(x, M')$ to get tuple $(i, j, b)$.
+            \li If $(i, j) \notin M$ then Bob aborts.
+            \li Bob outputs $0$ if $w_k = b$ and $1$ otherwise.
         \end{codebox}
 
-        First note that Bob only needs one bit of $Mx$ to figure out which of the two cases holds. This is because of the promise we are given: either $w_i = (Mx)_i~\forall~i\in\{0,...,\alpha n - 1\}$, or $w_i \neq (Mx)_i~\forall~i\in\{0,...,\alpha n - 1\}$. So if we can find one pair $(x_i, x_j)$ such that $(i, j) \in M$, then we have solved this problem. Hence one can think of this as a reduction to the Hidden Matching problem described in Section~\ref{sec:hidden-matching}.
+        First note that Bob only needs one bit of $Mx$ to figure out which of the two cases holds because of the promise. So if we can find one pair $(x_i, x_j)$ such that $(i, j) \in M$, then we have solved this problem.
 
-        If $\alpha = 1/2$, then $M = M'$ and thus we have the same protocol as we had for Hidden Matching, so the protocol will always succeed in that case. Indeed, the only case where we will fail is if the hidden matching protocol returns $(i, j, x_i \oplus x_j)$ such that $(i, j) \notin M$. We can reduce this probability by repeating the protocol $O(k/\alpha)$ times for some $k \ll \alpha n$ to get a high probability of successfully finding one bit of $Mx$ with $O(\log n)$ bits of communication.
+        The only case where we will fail is if the hidden matching protocol returns $(i, j, x_i \oplus x_j)$ such that $(i, j) \notin M$. We can reduce this probability by repeating the protocol $O(k/\alpha)$ times for some $k \ll \alpha n$ to get a high probability of successfully finding one bit of $Mx$ with $O(\log n)$ bits of communication.
 
-        So how well can we solve this problem with classical communication? Gavinsky et al.~\cite{Gavinsky:2007:ESO:1250790.1250866} used Fourier analysis to argue how much Bob can learn if Alice sends them $c$ bits, where $1 \leq c \leq \gamma \epsilon\sqrt{n/\alpha}$, for some $\epsilon > 0, \alpha \in (0,1/4]$ and a carefully chosen value of $\gamma$ which will be described later.
+        So how well can we solve this problem with classical communication? Gavinsky et al.~\cite{Gavinsky:2007:ESO:1250790.1250866} proved the following:
 
-        If Alice's message is deterministic based on $x$, then the $c$ bits Alice sends allow Bob to define a set $A \subseteq \{0, 1\}^n$ such that $|A| \geq 2^{n-c}$ of bit strings from which they must be able to guess Alice's input $x$. The probability of Bob succeeding then is the probability of them picking a bit string $x' \in A$ such that $Mx = Mx'$. We can define the probability of Bob finding a $k$-bit string $z$ as
+        \begin{theorem}
+            A random one-way protocol for $\alpha$-Matching problem with deterministic Alice requires $O(\sqrt{n/\alpha})$ bits of communication.
+        \end{theorem}
+
+        \begin{proof}
+        We can prove this by asking how much Bob can learn if Alice sends them $c$ bits, where $1 \leq c \leq \gamma \epsilon\sqrt{n/\alpha}$, for some $\epsilon > 0, \alpha \in (0,1/4]$ and a carefully chosen value of $\gamma$ which will be used later.
+
+        If Alice's message is deterministic based on $x$, then the $c$ bits Alice sends allows Bob to define a set $A \subseteq \{0, 1\}^n$ such that $|A| \geq 2^{n-c}$ of bit strings from which Bob must be able to guess Alice's input $x$. The probability of Bob succeeding then is the probability of him picking a bit string $x' \in A$ such that $Mx = Mx'$. We define the probability of Bob finding a string $x$ such that $Mx = z$ for some $k$-bit string $z$ as
 
         $$p_M(z) = \frac{|\{x \in A|Mx = z\}|}{|A|}.$$
 
@@ -354,7 +319,7 @@
 
         $$2^{2\alpha n}\mathbb{E_M}[\|p_M - U\|_2^2] = 2^{2\alpha n}\mathbb{E}_M\left[\sum_{z \in \{0, 1\}^{\alpha n}}(\widehat{p_M}(z) - \widehat{U}(z))^2\right] = 2^{2\alpha n}\mathbb{E}_M\left[\sum_{z \in \{0, 1\}^{\alpha n}\setminus\{0^{\alpha n}\}}\widehat{p_M}(z)^2\right]$$
 
-        where $\widehat{f}(z) = \sum_{y \in \{0, 1\}^{\alpha n}}f(y)(-1)^{x.y}$ is the Fourier transform of $f$ and $.$ is the dot product. Gavinsky et al.~show that the Fourier transform of our probability distribution is related to the indicator function of our set of possible Alice messages $A$:
+        where $\widehat{f}(z) = \sum_{y \in \{0, 1\}^{\alpha n}}f(y)(-1)^{x.y}$ is the Fourier transform of $f$ and $.$ is the dot product. Now let us look at the fourier transform of $p_M$:
 
         \begin{align*}
             \widehat{p_M}(z) &= \frac{1}{2^{\alpha n}}\sum_{s \in \{0, 1\}^{\alpha n}}p_M(s)(-1)^{s.z}\\
@@ -362,12 +327,12 @@
             &= \frac{1}{|A|2^{\alpha n}}\sum_{s \in \{0, 1\}^{\alpha n}}|\{y \in A|My = s\}|(-1)^{My.z}
         \end{align*}
 
-        Note that there is exactly one string $s \in \{0, 1\}^{\alpha n}$ such that $My = s ~\forall~ y \in A$. Because we are summing over all $\alpha n$-bit strings, we can remove that summation:
+        Note that for any given $y \in A$, there is exactly one $s \in \{0, 1\}^{\alpha n}$ such that $My = s$. Because we are summing over all $\alpha n$-bit strings, we are essentially summing over all $y \in A$:
 
         \begin{align*}
             \widehat{p_M}(z) &= \frac{1}{|A|2^{\alpha n}}\sum_{s \in \{0, 1\}^{\alpha n}}|\{y \in A|My = s\}|(-1)^{My.z}\\
-            &= \frac{1}{|A|2^{\alpha n}}|A|(-1)^{My.z}\\
-            &= \frac{1}{|A|2^{\alpha n}}|A|(-1)^{y.M^Tz}\\
+            &= \frac{1}{|A|2^{\alpha n}}\sum_{y \in A}(-1)^{My.z}\\
+            &= \frac{1}{|A|2^{\alpha n}}\sum_{y \in A}(-1)^{y.M^Tz}\\
             &= \frac{1}{|A|2^{\alpha n}}\sum_{y \in \{0, 1\}^n}1_A(y)(-1)^{y.M^Tz}\\
             &= \frac{2^n}{|A|2^{\alpha n}}\widehat{1_A}(M^Tz)
         \end{align*}
@@ -376,37 +341,36 @@
 
         $$2^{2\alpha n}\mathbb{E}_M\left[\sum_{z \in \{0, 1\}^{\alpha n}\setminus\{0^{\alpha n}\}}\widehat{p_M}(z)^2\right] = \frac{2^{2n}}{|A|^2}\mathbb{E}_M\left[\sum_{z \in \{0, 1\}^{\alpha n}\setminus\{0^n\}}\widehat{1_A}(M^Tz)^2\right].$$
 
-        Next, we move from summing over $\alpha-n$ bit strings to summing over $n$-bit strings, and note that the set $V = |\{s \in \{0, 1\}^{\alpha n}|M^Ts = v\}| \leq 1 ~\forall~ v \in \{0, 1\}^n$. This means that our expectation over $M$ can also be described as a probability over $M$:
+        Next, we move from summing over $\alpha-n$ bit strings to summing over $n$-bit strings, and note that the set $V = |\{s \in \{0, 1\}^{\alpha n}|M^Ts = v\}| \leq 1 ~\forall~ v \in \{0, 1\}^n$. This means that our expectation over $M$ is a probability:
 
         \begin{align*}
             \frac{2^{2n}}{|A|^2}\mathbb{E}_M\left[\sum_{z \in \{0, 1\}^{\alpha n}\setminus\{0^n\}}\widehat{1_A}(M^Tz)^2\right] &= \frac{2^{2n}}{|A|^2}\mathbb{E}_M\left[\sum_{v \in \{0, 1\}^n\setminus\{0^n\}}|\{s \in \{0, 1\}^{\alpha n}|M^Ts = v\}|\widehat{1_A}(v)^2\right]\\
             &= \frac{2^{2n}}{|A|^2}\sum_{v \in \{0, 1\}^n\setminus\{0^n\}}\mathrm{Pr}_M[\exists~ s \in \{0, 1\}^{\alpha n} \textrm{ s.t. } M^Ts = v]\widehat{1_A}(v)^2
         \end{align*}
 
-        Now we need to consider what this probability over $M$ is. Suppose the Hamming weight of $v$ is $|v| = k$ for even $k$\footnote{The Hamming weight of $M^Ts$ must be even and at most $2\alpha n$, so this restriction is acceptable for the problem at hand.}. Lemma 5 of \cite{Gavinsky:2007:ESO:1250790.1250866} showed that the fraction of partial matchings in $\mathcal{M}_\alpha$ that satisfy $M^Ts = v$ is equal to $\binom{\alpha n}{k/2}/\binom{n}{k}$. In other words, the number of $\alpha$-matchings which satisfy the condition is equal to the number of $\alpha n$-bit strings with Hamming weight $k/2$ over the number of $n$-bit strings with Hamming weight $k$. We can now re-write this probability as a sum over even values of $k$:
+        Now we need to consider what this probability over $M$ is. Suppose the Hamming weight of $v$ is $|v| = k$ for even $k$\footnote{The Hamming weight of $M^Ts$ is even and at most $2\alpha n$.}. Lemma 5 of \cite{Gavinsky:2007:ESO:1250790.1250866} showed that the fraction of $\alpha$-matchings which satisfy the probability is equal to the number of $\alpha n$-bit strings with Hamming weight $k/2$ over the number of $n$-bit strings with Hamming weight $k$:
 
         $$\frac{2^{2n}}{|A|^2}\sum_{v \in \{0, 1\}^n\setminus\{0^n\}}\mathrm{Pr}_M[\exists~ s \in \{0, 1\}^{\alpha n} \textrm{ s.t. } M^Ts = v]\widehat{1_A}(v)^2 = \frac{2^{2n}}{|A|^2}\sum_{\textrm{even }k=2}^{2\alpha n}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\sum_{v:|v| = k}\widehat{1_A}(v)^2$$
 
-        At this point, we are going assume that $k \leq 4c$ and let $\delta = k/4c$. Because $\delta \in (0,1]$, we can apply the Kahn, Kalai and Linial inequality \cite{21923} to find that
+        At this point, we are going assume that $k \leq 4c$ and let $\delta = k/4c$. Because $\delta \in (0,1]$, we can apply the Kahn, Kalai and Linial inequality \cite{21923}:
 
         \begin{align*}
             \sum_{\textrm{even }k=2}^{4c - 2}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\frac{2^{2n}}{|A|^2}\sum_{v:|v| = k}\widehat{1_A}(v)^2 &\leq \sum_{\textrm{even }k=2}^{4c-2}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\frac{2^{2n}}{|A|^2}\frac{1}{\delta^k}\left(\frac{|A|}{2^n}\right)^{2/(1 + \delta)}\\
-            &= \sum_{\textrm{even }k=2}^{4c - 2}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\frac{1}{\delta^k}\left(\frac{2^n}{|A|}\right)^{2\delta/(1 + \delta)}.\\
+            &= \sum_{\textrm{even }k=2}^{4c - 2}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\frac{1}{\delta^k}\left(\frac{2^n}{|A|}\right)^{2\delta/(1 + \delta)}\\
         \end{align*}
 
-        Noting that $1 + \delta > 1$, $|A| \geq 2^{n - c}$, $c \leq \gamma \epsilon \sqrt{n/\alpha}$ and estimating that $(n/k)^k \leq \binom{n}{k} \leq (en/k)^k$ we can bound this even further:
+        We bound this value by the following inequalities: $|A| \geq 2^{n - c}$, $(n/k)^k \leq \binom{n}{k} \leq (en/k)^k$ and $c \leq \gamma \epsilon \sqrt{n/\alpha}$:
 
         \begin{align*}
             \sum_{\textrm{even }k=2}^{4c - 2}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\frac{1}{\delta^k}\left(\frac{2^n}{|A|}\right)^{2\delta/(1 + \delta)} &\leq \sum_{\textrm{even }k=2}^{4c - 2}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\frac{1}{\delta^k}\left(\frac{2^n}{|A|}\right)^{k/2c}\\
             &\leq \sum_{\textrm{even }k=2}^{4c - 2}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\left(\frac{4\sqrt{2}c}{k}\right)^{k}\\
             &\leq \sum_{\textrm{even }k=2}^{4c - 2}\frac{(2e\alpha n)^{k/2}}{(n/k)^k}\left(\frac{4\sqrt{2}c}{k}\right)^{k}\\
-            &\leq \sum_{\textrm{even }k=2}^{4c - 2}\frac{(2e\alpha n)^{k/2}}{(n/k)^k}\left(\frac{4\sqrt{2}c}{k}\right)^{k}\\
             &\leq \sum_{\textrm{even }k=2}^{4c - 2}\left(\frac{64e\alpha c^2}{kn}\right)^{k/2} \leq \sum_{\textrm{even }k=2}^{4c - 2}\left(\frac{64e\gamma^2\epsilon^2}{k}\right)^{k/2}
         \end{align*}
 
-        A small value for $\gamma$ will ensure that this sum converges to at most $\epsilon^2/2$.
+        A small value for $\gamma$ will ensure that this sum is less than $\epsilon^2/2$.
 
-        Now that the lower part of the sum has been bound, we need to bound the sum for values of $k \geq 4c$. For this, we note that the term $\binom{\alpha n}{k/2}/\binom{n}{k}$ decreases as $k$ increases:
+        We now need to bound the sum for values of $k \geq 4c$. For this, we note that the term $\binom{\alpha n}{k/2}/\binom{n}{k}$ decreases as $k$ increases:
 
         \begin{align*}
             \frac{\binom{\alpha n}{k/2 - 1}/\binom{n}{k-2}}{\binom{\alpha n}{k/2}/\binom{n}{k}} &= \frac{(k/2)!(\alpha n - k/2)!}{(k/2 - 1)!(\alpha n - k/2 + 1)!}\frac{(k-2)!(n-k + 2)!}{k!(n-k)!}\\
@@ -414,26 +378,105 @@
             &= \frac{(n - k + 2)(n - k + 1)}{(2\alpha n - k + 2)(k - 1)} \geq \frac{n - k + 1}{k - 1} \geq 1
         \end{align*}
 
-        We can use this and our previous estimate for binomial coefficients to bound this equation:
+        Plugging this in and recalling that $(n/k)^k \leq \binom{n}{k} \leq (en/k)^k$, we find that
 
         \begin{align*}
             \frac{2^{2n}}{|A|^2}\sum_{\textrm{even }k=4c}^{2\alpha n}\frac{\binom{\alpha n}{k/2}}{\binom{n}{k}}\sum_{v:|v| = k}\widehat{1_A}(v)^2 &\leq \frac{2^{2n}}{|A|^2}\sum_{\textrm{even }k=4c}^{2\alpha n}\frac{\binom{\alpha n}{2c}}{\binom{n}{4c}}\sum_{v:|v| = k}\widehat{1_A}(v)^2\\
-            &= \frac{2^{2n}}{|A|^2}\left(\frac{8 e\alpha c}{n}\right)^{2c}\sum_{\textrm{even }k=4c}^{2\alpha n}\sum_{v:|v| = k}\widehat{1_A}(v)^2
+            &= \frac{2^{2n}}{|A|^2}\left(\frac{8 e\alpha c}{n}\right)^{2c}\sum_{\textrm{even }k=4c}^{2\alpha n}\sum_{v:|v| = k}\widehat{1_A}(v)^2.
         \end{align*}
 
-        Finally, noting by Parseval's identity that $\sum_{v \in \{0, 1\}^n}\widehat{1_A}(v)^2 = \|1_A\|_2^2 = 2^{-n}\sum_{v \in \{0, 1\}^n}1_A(v)^2 = |A|2^{-n}$, and recalling that $c \leq \gamma \epsilon \sqrt{n/\alpha}$ and $|A| \geq 2^{n-c}$, we find that
+        Now we note by Parseval's identity that $\sum_{v \in \{0, 1\}^n}\widehat{1_A}(v)^2 = \|1_A\|_2^2 = |A|2^{-n}$, and recall that $|A| \geq 2^{n-c}$ and $c \leq \gamma \epsilon \sqrt{n/\alpha}$:
 
         $$\frac{2^{2n}}{|A|^2}\left(\frac{8 e\alpha c}{n}\right)^{2c}\sum_{\textrm{even }k=4c}^{2\alpha n}\sum_{v:|v| = k}\widehat{1_A}(v)^2 \leq \frac{2^n}{|A|}\left(\frac{8 e\alpha c}{n}\right)^{2c} \leq 2^c\left(\frac{8 e\alpha c}{n}\right)^{2c} \leq \left(\frac{8\sqrt{2} e\gamma\epsilon\sqrt{n}}{\sqrt{\alpha}}\right)^{2c}$$
 
-        Again, by choosing $\gamma$ to be a small enough constant, this equation can be bounded by $\epsilon^2/2$. By adding these two cases together, we find that the squared total variation distance is at most $\epsilon^2$. To conclude this proof, we use Jensen's inequality to show that
+        Again, this equation can be bounded by $\epsilon^2/2$ for small enough $\gamma$. By adding these two cases together, we find that the squared total variation distance is at most $\epsilon^2$. To conclude, we use Jensen's inequality:
 
-        $$(\mathbb{E}_M[\|p_M - U\|_{tvd}])^2 \leq \mathbb{E}_M[\|p_M - U\|_{tvd}^2] \leq \epsilon^2.$$
+        $$(\mathbb{E}_M[\|p_M - U\|_{tvd}])^2 \leq \mathbb{E}_M[\|p_M - U\|_{tvd}^2] \leq \epsilon^2$$
 
-        Square-rooting these terms gives us that the total variation distance between Bob's probability distribution and the uniform becomes arbitrarily small if Alice sends much less than $\sqrt{n/\alpha}$ bits of classical data to Bob. Thus an exponential separation is shown.
+        We conclude that if Alice sends fewer than $\sqrt{n/\alpha}$ bits of classical data to Bob then this distribution is indistinguishable form uniform.
+        \end{proof}
 
-        A more general version of the problem was explored by Verbin and Yu in 2011 \cite{Verbin:2011:SCC:2133036.2133038}, where they looked at $t$-dimensional hypermatching. In this problem, Bob's input is now a hypermatching which matches $t$ bits together. So if $x$ is a $kt$-bit string for some integer $k$ and the $t$-dimensional hypermatching is $M = ((i_{1,1},...,i_{1,t}),(i_{k, 1},...,i_{k, t}))$, the string $Mx = \bigoplus_{0 \leq j < t}x_{i_{1, j}},...,\bigoplus_{0, \leq j < t}x_{i_{k, j}}$. Although their work did not show any bounds for quantum communication, Verbin and Yu showed that this problem requires $\Omega(n^{1-1/t})$ bits of classical communication. Note that this is consistent with Gavinsky et al.'s results for perfect matching in particular, as $t=2$ in that case.
+        A more general version of the problem was explored by Verbin and Yu in 2011 \cite{Verbin:2011:SCC:2133036.2133038}, where showed that $t$-dimensional hypermatching requires $\Omega(n^{1-1/t})$ bits of classical communication. Note that $t=2$ is consistent with Bar-Yossef, Jayram and Kerenidis' results for perfect matching \cite{doi:10.1137/060651835}.
 
-        \subsection{Permutation Invariance}
+        Another partial function related to both Subgroup Membership and $\alpha$-matching is Permutation Invariance \cite{Montanaro:2011:NES:2230916.2230919}, which is discussed in Appendix~\ref{sec:perm-invariance}.
+
+    \section{Conclusion}
+    \label{sec:conclusion}
+
+        Communication complexity has proven itself to be a powerful tool in theoretical computer science, from its origins in distributed computation to lower bounds in the circuit depth \& streaming models alongside applications in cryptography. It has also proven over the last two and a half decades to be useful for finding separations between classical and quantum computing.
+
+        We have presented in this report some of the one-way communication relations and partial functions for which the communication of bits is significantly worse than qubits. It is important to note that a number of other grand separations have also been proven which we have not been able to cover in this essay: Gavinsky \cite{gavinsky2008classical} showed a relation which had an exponential separation between one-way quantum communication and two-way randomised classical communication. Regev and Klartag \cite{Regev:2011:QOC:1993636.1993642} later showed a partial function with the same separation.
+
+        While we have focused on one-way communication complexity as well as some of two-way in this conclusion, there are many other models of communication complexity with varying levels of power. Some of these are summarised in Appendix~\ref{sec:other-models}.
+
+        \subsection{Open Problems}
+
+        Alas, for all the successes we have seen in one-way communication complexity, finding a total function for which there exists an advantage for quantum communication is still open. Such an advantage would ideally be exponential, as a polynomial gap could be useless in practice if sending classical bits is cheaper \cite{RevModPhys.82.665}. But even finding a polynomial gap has proven to be a challenge.
+
+        Aaronson and LeGall have made considerable headway towards finding a subgroup which cannot be solvable in $O(\log |G|)$ bits of communication, and conjecture that such a subgroup does exist \cite{0902.3175}. Indeed, Aaronson called the problem one of his Ten Semi-Grand Challenges\footnote{\url{http://www.scottaaronson.com/blog/?p=471}}.
+
+        While the hidden subgroup problem might show a gap for one-way communication, there is an $O(\log|G|)$ protocol in two-way communication: Bob sends $g$ to Alice who sends back $0$ if $g \in H$ and $1$ otherwise. Thus we would still need a different problem in order to show even a separation for a total function between two-way randomised classical communication and one-way quantum communication.
+
+    \bibliographystyle{alpha}
+    \bibliography{quantum_communication_complexity}{}
+
+    \appendix
+
+    \section{Nayak's Proof of Quantum Communication Complexity}
+    \label{sec:nayak}
+
+    \begin{proof}[Proof of Theorem~\ref{thm:nayak}]
+        Suppose we create an encoding $x \mapsto \{q_{x,i}|\phi_{x_i}\rangle\}$ such that $x$ is an $n$-bit string and $\{q_{x,i}|\phi_{x_i}\rangle\}$ is a mixed state over $m$ qubits. We decode this message by measuring over projection operators $\{P_x\}$. The mean probability of Bob successfully decoding an $x$ that has been selected uniformly at random is $2^{-n}\sum_{x, i}q_{x, i}\|P_x|\phi_{x,i}\rangle\|^2$. This can be bounded by making our states pure and setting $|\phi_x\rangle = \max_{|\psi_{x, i}\rangle}\|P_x|\phi_{x, i}\rangle\|^2$:
+
+        $$\frac{1}{2^n}\sum_{x, i}q_{x, i}\|P_x|\phi_{x,i}\rangle\|^2 \leq \frac{1}{2^n}\sum_{x}\|P_x|\phi_{x}\rangle\|^2$$
+
+        Next, we decompose $P_x$ into an orthonormal basis $\{|\hat{e}_{x, j}\rangle\}$ and create a subspace $E$ that spans the code words $\{|\phi_x\rangle\}$ with projection $Q$:
+
+        $$\frac{1}{2^n}\sum_{x}\|P_x|\phi_{x}\rangle\|^2 = \frac{1}{2^n}\sum_{x, j}\langle\phi_x|\hat{e}_{x, j}\rangle\langle\hat{e}_{x, j}|\phi_x\rangle \leq \frac{1}{2^n}\sum_{x}\|Q|\hat{e}_{x, j}\rangle\|^2$$
+
+        Finally, we decompose $Q = \sum_i|e_i\rangle\langle e_i|$ where $\{|e_i\rangle\}$ is an orthonormal basis spanning $E$. Note that since $|\phi_x\rangle$ is conveyed in at most $m$ qubits, $|\{|e_i\rangle\}| \leq 2^m$. Hence we conclude that
+
+        $$\frac{1}{2^n}\sum_{x, j}\|Q|\hat{e}_{x, j}\rangle\|^2 \leq \frac{1}{2^n}\sum_{x, j, i}|\langle e_i|e_{x, j}\rangle|^2 \leq \frac{1}{2^n}\sum_{i}|\langle e_i|e_i\rangle|^2 \leq 2^{m - n}.$$
+    \end{proof}
+
+    \section{Distributed Deutsch-Jozsa Lower Bound}
+    \label{sec:ddj-lower-bound}
+
+    \begin{proof}[Proof of Theorem~\ref{thm:ddj}]
+        To lower bound the Distributed Deutsch-Jozsa problem, denoted $DDJ$, we will partition the problem space up into rectangles $(a, b, c, d)$ such that $DDJ(x_i, y_i) = DDJ(x_i', y_i')$ for any pair of inputs $(x_i, y_i), (x_i', y_i') \in \{x_a,x_{a + 1},...,x_{b}\} \times \{y_c, y_{c+1},...,y_d\}$. We can lower bound the number of messages to $c$ bits if we need $2^c$ rectangles to cover the entire problem space.
+
+        For this problem, we will focus on the inputs $(x, x)$, where $x$ is an $n$-bit string with hamming weight $n/2$. There are $\binom{n}{n/2} \approx 2^n/\sqrt{n}$ such inputs, which means that at least one rectangle $R$ must contain $2^{n-c}/\sqrt{n}$ of these inputs. Because $DDJ(x, x) = 0 ~\forall~x\in \{0, 1\}^n$, all $(x, y)$-pairs in $R$ must satisfy either $x = y$ to output $0$ or $d(x, y) \neq n/2$ to break the promise. Characteristic analysis detailed in \cite{RevModPhys.82.665} show that the maximum number of $(x, x)$ inputs in $R$ is $1.99^n$ \cite{frankl1987forbidden}. Hence we have the inequality
+
+        $$\frac{2^{n-c}}{\sqrt{n}} \leq 1.99^n$$
+
+        Solving for $c$ shows that $c \geq \log_2(2^n/1.99^n\sqrt{n}) = \Omega(0.007n)$.
+    \end{proof}
+
+        Note that Buhrman et al.~\cite{RevModPhys.82.665} provide this as a lower bound instead of an asymptotic lower bound, but this is only correct if $n \geq 728$. Figure \ref{fig:ddj-bound} shows a plot of $\log_2(2^n/(1.99^n*\sqrt{n}))$ and $0.007n$ for even values of $n$ ranging from $2$ to $1000$. Note that the inequality $\log_2(2^n/(1.99^n*\sqrt{n})) \geq 0.0007n$ claimed in \cite{RevModPhys.82.665} only fits if $n \geq 728$.
+
+        We can see that the inequality holds for all values of $n \geq 728$ by differentiating the two sides of the equation. The right-hand side can be easily differentiated as $d(0.0007n)/dn = 0.0007$, and the left-hand side can be differentiated as follows:
+
+        $$\frac{d}{dn}\log_2\left(\frac{2^n}{1.99^n\sqrt{n}}\right) = \frac{d}{dn}\log_2\left(\frac{2^n}{1.99^n}\right) - \frac{d}{dn}\log_2(\sqrt{n}) = \log_2\left(\frac{2}{1.99}\right) - \frac{1}{\textrm{ln}(4)n}$$
+
+        As $n$ tends towards infinity, this derivative will tend towards $log_2(2/1.99) \approx 0.00723 > 0.0007$. The point when the derivative is greater than 0.0007 is when $n \geq 112$. Thus by the time the inequality by Buhrman et al.~ holds, the left hand side will be always growing at a faster rate than the right and the inequality will continue to hold.
+
+        \begin{figure}
+            \includegraphics[width=\linewidth]{ddj_bound}
+            \caption{Plot of lower bounds of Distributed Deutsch-Jozsa for $n \in \{2, 4,..., 998, 1000\}$}
+            \label{fig:ddj-bound}
+        \end{figure}
+
+    \section{Lower Bound for Hidden Matching}
+    \label{sec:hm-lower-bound}
+
+    \begin{proof}[Proof of Theorem~\ref{thm:hm}]
+        Take any protocol for computing the Hidden Matching Problem with mean probability of failure $\delta$ across Alice and Bob's input. If we pick a certain input for Alice $x$, we will denote the probability of error given $x$ as $\hat{e}_x$. By Markov's inequality, $Pr[\hat{e}_x \geq 2\delta] \leq \mathbb{E}[\hat{e}_x]/2\delta = \delta/2\delta = 1/2$, so at most half of Alice's inputs can fail more than $\delta/2$ of the time.
+
+        Assuming Alice's message to Bob is written deterministically, we define the set of Alice's inputs that map to a message $\tau$ and have error less than $2\delta$ as $S_{\tau}$. Note that $\sum_{\tau}S_{\tau}$ is equal to the number of Alice's inputs with error less than $2\delta$. Using Markov's inequality above, this sum must be greater than $2^{n-1}$. Bar-Yossef, Jayram and Kerenidis then showed that for any message $\tau$, the size of the set $S_{\tau}$ is at most $2^{\Omega(n - \sqrt{n})}$. Combining these two inequalities, the number of unique messages Alice could send to Bob is at least $2^{n - 1}/2^{n - \Omega(\sqrt{n})} = 2^{\Omega(\sqrt{n}) - 1} = 2^{\Omega(\sqrt{n})}$. Assuming Alice's input is chosen uniformly at random, the length of each message must be at least $\Omega(\sqrt{n})$ classical bits. This bound is tight if public random bits are shared between Alice and Bob, as Alice can send $O(\sqrt{n})$ bits $x_i$, where $i$ is chosen from the random string. By the birthday paradox, the expected probability that a pair of indices were in Bob's matching is $1$.
+    \end{proof}
+
+    \section{Permutation Invariance}
+    \label{sec:perm-invariance}
 
         Permutation Invariance is a problem first studied in the context of communication complexity by Montanaro \cite{Montanaro:2011:NES:2230916.2230919}, and has connections both to the Hidden Subgroup Membership problem discussed in Section~\ref{sec:subgroup-membership} and the Hidden Matching problem discussed in Section~\ref{sec:hidden-matching}.
 
@@ -466,47 +509,11 @@
 
         The problem also relates to Hidden Matching if we only consider permutations which are completely made of disjoint pairs -- in other words, the permutation pairs bits up and swaps those pairs. Bob can build a perfect matching $M'$ by adding edges $(i, j)$ if the permutation matrix $M$ swaps $i$ with $j$. Hence this problem can be reduced to Hidden Matching, with the difference being that Bob no longer has $w$ as an input.
 
-        So, how well can we perform classically? Montanaro \cite{Montanaro:2011:NES:2230916.2230919} provided a lower bound by looking at a subproblem, where Alice has a $2n$-bit string $x$ such that $|x| = n$, Bob has a $2n \times 2n$ permutation matrix $M$ and either $Mx = x$ or $d(Mx, x) \geq n/8$. Montanaro's proof breaks the problem up into two probability distributions: $\mathcal{D}_0$ when $d(Mx, x) \geq n/8$ and $\mathcal{D}_1$ when $Mx = x$. Their conclusion was that if Alice sends fewer than $\frac{n^{7/16}}{e\textrm{ln}2} - O(\log n)$ classical bits, then $\mathcal{D}_0$ and $\mathcal{D}_1$ becomes indistinguishable from the normal distribution within constant factors, and thus the distributions are indistinguishable from each other. Thus we have another exponential gap between quantum and random communication for a promise function.
+        How well can we perform classically? Montanaro \cite{Montanaro:2011:NES:2230916.2230919} provided a lower bound by looking at a subproblem, where Alice has a $2n$-bit string $x$ such that $|x| = n$, Bob has a $2n \times 2n$ permutation matrix $M$ and either $Mx = x$ or $d(Mx, x) \geq n/8$. Montanaro's proof breaks the problem up into two probability distributions: $\mathcal{D}_0$ when $d(Mx, x) \geq n/8$ and $\mathcal{D}_1$ when $Mx = x$. Their conclusion was that if Alice sends fewer than $\frac{n^{7/16}}{e\textrm{ln}2} - O(\log n)$ classical bits, then $\mathcal{D}_0$ and $\mathcal{D}_1$ becomes indistinguishable from the normal distribution within constant factors, and thus the distributions are indistinguishable from each other. Thus we have the following:
 
-    \section{Conclusion}
-    \label{sec:conclusion}
-
-        Communication complexity has proven itself to be a powerful tool for analysis of many subjects within theoretical computer science, from its origins in distributed computation to lower bounds in the circuit depth and streaming models as well as applications in cryptography. Alongside these classical achievements, it has also proven over the last two and a half decades to be a useful model for finding separations between classical and quantum computing.
-
-        We have presented in this report some of the one-way communication problems for which the communication of classical bits is significantly worse than the communication of quantum bits. In particular, we have highlighted some of the achievements made in finding gaps between classical and quantum communication for partial functions and total relations.
-
-        It is important to note that a number of other grand separations have also been proven which we have not been able to cover in this essay. Gavinsky \cite{gavinsky2008classical} showed a relation which could be solved in a logarithmic amount of one-way quantum communication, but required polynomial bits of classical communication, even if the communication was two-way and randomised. Regev and Klartag \cite{Regev:2011:QOC:1993636.1993642} later showed that this holds even for partial functions.
-
-        While we have focused on one-way communication complexity as well as some of two-way in this conclusion, there are many other models of communication complexity with varying levels of power. Some of these are summarised in Appendix~\ref{sec:other-models}.
-
-        \subsection{Open Problems}
-
-        Alas, for all the successes we have seen in one-way communication complexity, there is still the open problem of finding a total function for which there exists an advantage for quantum communication. Such an advantage would ideally be exponential, as a polynomial gap could offer little use in practice due to the ability to send classical bits at less of a cost \cite{RevModPhys.82.665}. But even finding a polynomial gap has proven to be a challenge.
-
-        Aaronson and LeGall have made considerable headway towards finding a subgroup which cannot be solvable in $O(\log |G|)$ bits of communication, and conjecture that such a subgroup does exist \cite{0902.3175}. Indeed, Aaronson in 2010 deemed the problem to be one of his Ten Semi-Grand Challenges for Quantum Computing Theory\footnote{\url{http://www.scottaaronson.com/blog/?p=471}}.
-
-        While the hidden subgroup problem might prove useful as a total function with a gap for one-way communication, there is a trivial $O(\log|G|)$ protocol in two-way classical communication: Bob sends $g$ to Alice who then checks if $g \in H$ and sends back $0$ or $1$ depending on the result. Thus we would still need a different problem in order to show even a polynomial separation for a total function between two-way randomised communication and one-way quantum communication.
-
-    \bibliographystyle{alpha}
-    \bibliography{quantum_communication_complexity}{}
-
-    \appendix
-    \section{Distributed Deutsch-Jozsa Lower Bound}
-    \label{sec:ddj-lower-bound}
-
-        Figure \ref{fig:ddj-bound} shows a graph showing a plot of $\log_2(2^n/(1.99^n*\sqrt{n}))$ and $0.007n$ for even values of $n$ ranging from $2$ to $1000$. Note that the inequality $\log_2(2^n/(1.99^n*\sqrt{n})) \geq 0.0007n$ claimed in \cite{RevModPhys.82.665} only fits if $n \geq 728$.
-
-        We can see that the inequality holds for all values of $n \geq 728$ by differentiating the two sides of the equation. The right-hand side can be easily differentiated as $d(0.0007n)/dn = 0.0007$, and the left-hand side can be differentiated as follows:
-
-        $$\frac{d}{dn}\log_2\left(\frac{2^n}{1.99^n\sqrt{n}}\right) = \frac{d}{dn}\log_2\left(\frac{2^n}{1.99^n}\right) - \frac{d}{dn}\log_2(\sqrt{n}) = \log_2\left(\frac{2}{1.99}\right) - \frac{1}{\textrm{ln}(4)n}$$
-
-        As $n$ tends towards infinity, this derivative will tend towards $log_2(2/1.99) \approx 0.00723 > 0.0007$. The point when the derivative is greater than 0.0007 is when $n \geq 112$. Thus by the time the inequality by Buhrman et al.~ holds, the left hand side will be always growing at a faster rate than the right and the inequality will continue to hold.
-
-        \begin{figure}
-            \includegraphics[width=\linewidth]{ddj_bound}
-            \caption{Plot of lower bounds of Distributed Deutsch-Jozsa for $n \in \{2, 4,..., 998, 1000\}$}
-            \label{fig:ddj-bound}
-        \end{figure}
+        \begin{theorem}
+            Any randomised one-way protocol for Permutation Invariance requires $O(n^{7/16})$ classical bits of communication.
+        \end{theorem}
 
     \section{Other Models}
     \label{sec:other-models}
