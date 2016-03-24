@@ -3,6 +3,7 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{amsthm}
+\usepackage[title]{appendix}
 \usepackage[affil-it]{authblk}
 \usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
@@ -30,7 +31,7 @@
 
     \section{Introduction}
 
-        Ever since the idea of quantum computing was first suggested, one of the most important questions in the area was what advantages would a quantum computer have over classical computers? In the decades that followed, quantum computers have shown many benefits, from factoring integers \cite{Shor:1997:PAP:264393.264406} to searching data \cite{Grover:1996:FQM:237814.237866}. Given that quantum computers have shown such advantages for a single computer setting, a natural question is can they show advantages in distributed computation?
+        Ever since the idea of quantum computing was first suggested, one of the most important questions has been ``What advantages would a quantum computer have over classical computers?'' In the decades that followed, quantum computers have shown many benefits, from factoring integers \cite{Shor:1997:PAP:264393.264406} to searching data \cite{Grover:1996:FQM:237814.237866} and even secure communication \cite{Bennett20147}. Given that quantum computers have shown such advantages for a single computer setting, a natural question is can they show advantages in distributed computation?
 
         We can evaluate the advantage of distributed quantum computation via communication complexity. Communication complexity is a very powerful model -- enough to earn its creator the first Knuth Prize \footnote{\url{http://www.sigact.org/Prizes/Knuth/1996.html}.} -- and has proven lower bounds in a wide variety of models. It has also led to applications in different forms of computation, from secure multi-party computation to data streaming. But finding separations is not easy, and Holevo's theorem has from the beginning shown us that there are problems which cannot be solved more efficiently via quantum communication.
 
@@ -41,9 +42,9 @@
 
         Communication complexity was developed by Yao in 1979 as an analysis of distributed computing \cite{Yao:1979:CQR:800135.804414}. Under this model, our computation is done between two parties, commonly referred to as Alice and Bob, with inputs $x, y \in \{0, 1\}^n$, respectively. The two parties do not know each other's inputs; Alice does not know $y$ and Bob does not know $x$. Alice and Bob then exchange a series of messages between each other through a known protocol, with their aim being to jointly compute $f(x, y)$. The question communication complexity asks is how many bits of information do Alice and Bob need to communicate in order for them. We offer a sketch of a typical communication complexity problem in Figure~\ref{fig:cc}.
 
-        A na\"{i}ve solution to any communication complexity problem uses $n$ bits of communication: Alice sends $x$ to Bob and Bob computes $f(x, y)$, possibly sending the result back to Alice. So the question then becomes if it is possible to compute $f(x, y)$ with $o(n)$ bits of communication.
+        A na\"{i}ve solution to any communication complexity problem uses $n$ bits of communication: Alice sends $x$ to Bob and Bob computes $f(x, y)$, possibly sending the result back to Alice. So the question is ``Can we compute $f(x, y)$ with $o(n)$ bits of communication?''
 
-        One of the key benefits to communication complexity is that it is a useful model to prove lower bounds for, and there are a number of established techniques for doing so. Lower bounds in communication complexity have also led to bounds in the data streaming model of computation\footnote{See \cite{TCS-002} for an explanation of the data streaming model.} such as in \cite{Gavinsky:2007:ESO:1250790.1250866} \& \cite{Verbin:2011:SCC:2133036.2133038}, as well as lower bounds for quantum and classical circuit depth \cite{MSC:4265920, 366852}. Beyond the computation of lower bounds, other applications to communication complexity include classical security \cite{Gavinsky:2007:ESO:1250790.1250866} and secure multiparty computation in both classical and quantum settings \cite{Franklin:1992:CCS:129712.129780, Data2014, 1409.8488}.
+        One of the key benefits to communication complexity is that it is a useful model for proving lower bounds, and there are a number of established techniques for doing so. Lower bounds in communication complexity have also led to bounds in the data streaming model of computation\footnote{See \cite{TCS-002} for an explanation of the data streaming model.} such as in \cite{Gavinsky:2007:ESO:1250790.1250866} \& \cite{Verbin:2011:SCC:2133036.2133038}, as well as lower bounds for quantum and classical circuit depth \cite{MSC:4265920, 366852}. Beyond the computation of lower bounds, other applications to communication complexity include classical security \cite{Gavinsky:2007:ESO:1250790.1250866} and secure multiparty computation in both classical and quantum settings \cite{Franklin:1992:CCS:129712.129780, Data2014, 1409.8488}.
 
         \begin{figure}
             \centering
@@ -65,35 +66,15 @@
             \label{fig:cc}
         \end{figure}
 
-        \subsection{One-Way Communication Complexity}
-
-        In one-way communication complexity, Alice and Bob again receive respective inputs $x, y \in \{0, 1\}^n$ with the aim being for Bob to output $f(x, y)$ for some function $f$. The difference now is that only one message is allowed to be sent from Alice to Bob, and Bob cannot send any messages to Alice. This is illustrated in \ref{fig:ow-cc}.
-
-        \begin{figure}
-            \centering
-            \begin{tikzpicture}[->, draw, node distance=2cm]
-                \node[circle, draw] (Alice) at (0,0) {Alice};
-                \node[circle, draw] (Bob) [right of=Alice] {Bob};
-                \node (x) [above of=Alice] {$x$};
-                \node (y) [above of=Bob] {$y$};
-                \node (bout) [below of=Bob] {$f(x, y)$};
-                \path
-                    (x) edge (Alice)
-                    (y) edge (Bob)
-                    (Bob) edge (bout);
-                \path (Alice.east) edge (Bob.west);
-            \end{tikzpicture}
-            \caption{An example of one-way communication complexity. Alice receives input $x$ and Bob receives input $y$. Alice then sends a single message to Bob. Using this additional information from Alice, Bob performs and outputs the computation $f(x, y)$.}
-            \label{fig:ow-cc}
-        \end{figure}
+        In one-way communication complexity, Alice and Bob again receive respective inputs $x, y \in \{0, 1\}^n$ with the aim being for Bob to output $f(x, y)$ for some function $f$. The difference now is that only one message is allowed to be sent from Alice to Bob, and Bob cannot send any messages to Alice.
 
         \subsection{Quantum Communication Complexity}
 
-        In quantum communication complexity, first proposed in 1993 by Yao \cite{366852}, we also have parties Alice and Bob given inputs $x$ and $y$, respectively, and have to produce $f(x, y)$ for some function $f$. But now our two parties can send quantum messages between each other, and the complexity is measured in the number of qubits that are communicated.
+        In quantum communication complexity, first proposed in 1993 by Yao \cite{366852}, we also have parties Alice and Bob given inputs $x$ and $y$, respectively, who have to compute $f(x, y)$ for some function $f$. But now our two parties can send quantum messages between each other, and the complexity is measured in the number of qubits that are communicated.
 
-        Another model by Burhman and Cleve \cite{PhysRevA.56.1201} does not use the physical sending of data between the parties, but instead uses the measurement of entangled particles for remote computation. While our focus for this report however will be on the former, it is possible to simulate communicating $l$ individual qubits by use of $l$ entangled pairs and $2l$ classical bits of communication, via quantum teleportation \cite{PhysRevLett.70.1895}. Likewise, it is possible to simulate this model by the ability to communicate quantum states: Alice generates entangled pairs of qubits and sends one of the pair to Bob.
+        Another model by Cleve and Buhrman \cite{PhysRevA.56.1201} does not use the physical sending of data between the parties, but instead uses the measurement of entangled particles for remote computation. While our focus for this report however will be on the former, it is possible to simulate communicating $l$ individual qubits by use of $l$ entangled pairs and $2l$ classical bits of communication, via quantum teleportation \cite{PhysRevLett.70.1895}. Likewise, it is possible to simulate this model by the ability to communicate quantum states: Alice generates entangled pairs of qubits and sends one of the pair to Bob. This and other models are briefly discussed in Appendix~\ref{sec:other-models}.
 
-        Because of the well-established techniques for lower-bounding classical communication complexity, a common area of research is to see if there are any problems which quantum protocols can solve by communicating fewer qubits than the number of classical bits stated in known lower bounds. Finding quantum protocols that beat classical lower bounds can give us intuition on the difference between quantum and classical encoding of data. These protocols will be the focus of Section~\ref{sec:cc}.
+        Because of the well-established techniques for lower-bounding classical communication complexity, a common area of research is to see if there are any problems which quantum protocols can solve by communicating fewer qubits than the number of classical bits required by lower bounds. Finding quantum protocols that beat classical lower bounds can give us intuition on the difference between quantum and classical encoding of data. These protocols will be the focus of Section~\ref{sec:cc}.
 
         \subsection{Holevo's Theorem}
 
@@ -108,10 +89,10 @@
 
         \begin{theorem}
             \label{thm:nayak}
-            Any quantum protocol for COMMUNICATION that uses $O(2^m)$ bits of quantum communication succeeds with probability at most $2^{m-n}$.
+            Any quantum protocol for COMMUNICATION that uses $O(2^m)$ qubits of communication succeeds with probability at most $2^{m-n}$.
         \end{theorem}
 
-        We can proove Theorem~\ref{thm:nayak} by Holevo's theorem, but a later proof by Nayak \cite{814608} explains this result explicitly for encoding classical data in quantum data. This proof is given in Appendix~\ref{sec:nayak}.
+        We can prove Theorem~\ref{thm:nayak} by Holevo's theorem, but a later proof by Nayak \cite{814608} explains this result explicitly for encoding classical data in quantum data. This proof is given in Appendix~\ref{sec:nayak}.
 
         The only exception to this is if Alice and Bob have shared entangled qubits between each other prior to computation, in which case superdense coding can be used to communicate two bits by physically sending one qubit \cite{PhysRevLett.69.2881}. On the other hand, if Alice and Bob share prior entanglement and can communicate classically, they can communicate single qubits by physically sending pairs of bits \cite{PhysRevLett.70.1895}, so we can only save at most a factor of $1/2$ \cite{quant-ph/0101005}.
 
@@ -129,7 +110,7 @@
     \section{Separations Between Quantum and Classical Communication Complexity}
     \label{sec:separations}
 
-        While it is clear from Holevo's theorem that we cannot solve all problems in fewer qubits than we can in classical bits, we will in this section look at a variety of functions which Alice and Bob can solve more efficiently by exchanging qubits instead of bits.
+        While it is clear from Holevo's theorem that we cannot solve all problems in fewer qubits than we can in classical bits, there are a number of problems which can be solved by communicating fewer qubits than classical bits. Some of the significant results are described in this section.
 
         \subsection{Distributed Deutsch-Jozsa}
 
@@ -164,9 +145,9 @@
         \subsection{Subgroup Membership}
         \label{sec:subgroup-membership}
 
-        Another disadvantage is that the Distributed Deutsch-Jozsa problem is a partial function, in that it requires a promise. This begs the question: Are there any functions which do not rely on promises -- better known as total functions -- but still have a quantum advantage?
+        Another disadvantage with the Distributed Deutsch-Jozsa problem is that it is a partial function, in that it requires a promise. This begs the question: Are there any functions which do not rely on promises -- better known as total functions -- but still have a quantum advantage?
 
-        This is an open question, but some progress has been made. Aaronson et al.~\cite{0902.3175} explored the problem of subgroup membership as potentially yielding a quantum advantage for a total function. Their protocol for solving subgroup membership, based on an earlier quantum algorithm by Watrous \cite{Watrous:2000:SQP:795666.796590}, is described below, where $G$ is a group, $\mathscr{H}_G$ is the set of all subgroups of $G$, $|+\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)$ and $U_{G, y} = \sum_{g \in G}|yg\rangle\langle g|$ for some $y \in G$:
+        This is an open question, but some progress has been made. Aaronson et al.~\cite{0902.3175} explored the problem of subgroup membership as potentially yielding a quantum advantage for a total function. Their protocol for solving subgroup membership, based on an earlier algorithm by Watrous \cite{Watrous:2000:SQP:795666.796590}, is described below, where $G$ is a group, $\mathscr{H}_G$ is the set of all subgroups of $G$, $|+\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)$ and $U_{G, y} = \sum_{g \in G}|yg\rangle\langle g|$ for some $y \in G$:
 
         \begin{codebox}
             \Procname{Protocol $\proc{SUBGROUP-MEMBERSHIP}$}
@@ -180,19 +161,20 @@
 
         Any element $h \in H$ can be described in $\lceil\log |G|\rceil$ bits, so Alice needs to send $O(\log |G|)$ qubits to Bob in order to perform this protocol.
 
-        After line 2, Bob has the state $\frac{1}{\sqrt{2}}(|H\rangle|0\rangle + |yH\rangle|1\rangle)$, where $|yH\rangle = \frac{1}{\sqrt{|H|}}\sum_{yh \in H}|h\rangle$. If $y \in H$ then $U_{G, y}|H\rangle|+\rangle = |H\rangle|+\rangle$, so applying a Hadamard to the final qubit makes the final qubit $|0\rangle$. A measurement in the computational basis will thus always yield $0$.
+        After line 2, Bob has the state $\frac{1}{\sqrt{2}}(|H\rangle|0\rangle + |yH\rangle|1\rangle)$, where $|yH\rangle = \frac{1}{\sqrt{|H|}}\sum_{h \in H}|yh\rangle$. If $y \in H$ then $U_{G, y}|H\rangle|+\rangle = |H\rangle|+\rangle$, so applying a Hadamard to the final qubit makes the final qubit $|0\rangle$. A measurement in the computational basis will thus always yield $0$.
 
         On the other hand, if $y \notin H$ then $\langle yH|H\rangle = 0$, so applying the Hadamard produces
 
-        $$\frac{1}{2}(|H\rangle|0\rangle + |H\rangle|1\rangle + |yH\rangle|0\rangle - |yH\rangle|1\rangle).$$
+        $$\frac{1}{2}((|H\rangle + |yH\rangle)|0\rangle + (|H\rangle - |yH\rangle)|1\rangle).$$
 
-        Measuring the final qubit will result in $|0\rangle$ -- and thus a false positive -- with probability $1/2$. We can repeat this protocol to reduce this error.
+        Measuring the ancilla qubit will result in $|0\rangle$ -- and thus a false positive -- with probability $1/2$. We can repeat this protocol a constant number of times to reduce this error.
 
         Classically, it has been shown by Miltersen et al.~\cite{Miltersen199837} that any one-way randomised protocol with completeness probability of $1/2$ and perfect soundness must use $\Omega(\log^2|G|)$ bits of communication. Aaronson et al.~ have conjectured that this bound still holds even in a bounded-error setting.
 
-        So, if we can find a total subgroup membership function that cannot classically be solved using $O(\log |G|)$ bits of communication, then we will have a quadratic gap for a total function. The problem is that there are many subgroups which can be solved classically. For example, Aaronson et al.~ gave the following theorem for normal subgroups:
+        So if we can find a total subgroup membership function that cannot classically be solved using $O(\log |G|)$ bits of communication, then we will have a quadratic gap for a total function. The problem is that there are many subgroups which can be solved classically. For example, Aaronson et al.~gave the following theorem for normal subgroups:
 
         \begin{theorem}
+            \label{thm:norm-sg-membership}
             For normal subgroup $H \in \mathscr{H}_G, y \in G$ there is an $O(\log|G|)$ protocol which outputs with probability $1$ if $y \in H$ and $0$ with probability at least $1/2$ if $y \notin H$.
         \end{theorem}
 
@@ -216,7 +198,7 @@
             \li Bob outputs $1$ if $y \in \textrm{ker}(\mu)$ and $0$ otherwise.
         \end{codebox}
 
-        \begin{proof}[Proof of NORMAL-SUBGROUP-MEMBERSHIP]
+        \begin{proof}[Proof of Theorem~\ref{thm:norm-sg-membership}]
         If $y \in H \subseteq \textrm{ker}(\mu)$ then $\mu(y) = \mu(1)$ and thus the protocol will succeed. So the protocol fails if Alice picks a character $\mu$ such that $y \in \textrm{ker}(\mu) \setminus H$. We shall call the set of all characters that would cause an error $B$. Based on Alice's selection probability, the probability of an error is thus
 
         $$\frac{|H|}{|G|}\sum_{\chi \in B}[\chi(1)]^2.$$
@@ -232,12 +214,12 @@
         Thus this protocol fails with probability at most $1/2$. Finally, we note that is is possible to describe $\mu$ in $\lceil\log|G|\rceil$ bits, as $\mu \in \Lambda_H$ and $|\lambda_H| \leq |Char(G)| \leq |G|$.
         \end{proof}
 
-        Other groups also proven to be solvable in $(O\log|G|)$ bits of communication include groups with small modular or representations and groups with small complex representations. So already we have three cases of groups which don't have a separation.
+        Other groups also proven to be solvable in $(O\log|G|)$ bits of communication include groups with small modular or representations and groups with small complex representations \cite{0902.3175}. So already we have three cases of groups which don't have a separation.
 
         \subsection{Hidden Matching}
         \label{sec:hidden-matching}
 
-        A matching $M$ is a sequence of pairs $(i_1, j_1), (i_2, j_2),...,(i_k, j_k) \in [n]^2$. If no integer appears in any pair more than once, then the pairs are {\em disjoint}. A matching is said to be {\em partial} the pairs are disjoint but some indexes do not appear in any pair, and {\em perfect} if each integer appears in exactly one pair. A matching $M$ together with an $n$-bit string $x$ define a $k$-bit string as follows:
+        A matching $M$ is a sequence of $k$ pairs $(i_1, j_1), (i_2, j_2),...,(i_k, j_k) \in [n]^2$. If no integer appears in any pair more than once, then the pairs are disjoint. A matching is said to be partial the pairs are disjoint but some indexes do not appear in any pair, and perfect if each integer appears in exactly one pair. A matching $M$ together with an $n$-bit string $x$ define a $k$-bit string as follows:
 
         $$Mx = (x_{i_1} \oplus x_{j_1}), (x_{i_2} \oplus x_{j_2}), ... (x_{i_k} \oplus x_{j_k})$$
 
@@ -281,12 +263,12 @@
             \zi \const{Promise}: $w = Mx$ or $\bar{w} = Mx$.
             \zi \const{Bob's output}: $0$ if $w = Mx$, $1$ otherwise.
             \li Bob adds $(i, j)$ pairs to their matching to get perfect matching $M'$.
-            \li Alice and Bob run the Hidden Matching on $(x, M')$ to get tuple $(i, j, b)$.
+            \li Alice and Bob run the HIDDEN-MATCHING protocol on $(x, M')$ to get tuple $(i, j, b)$.
             \li If $(i, j) \notin M$ then Bob aborts.
             \li Bob outputs $0$ if $w_k = b$ and $1$ otherwise.
         \end{codebox}
 
-        First note that Bob only needs one bit of $Mx$ to figure out which of the two cases holds because of the promise. So if we can find one pair $(x_i, x_j)$ such that $(i, j) \in M$, then we have solved this problem.
+        First note that Bob only needs one bit of $Mx$ to figure out which of the two cases holds because of the promise. So if we can find one pair $(x_i, x_j)$ such that $(i, j) \in M$, then we have solved this problem. Since the pairs in $M$ are disjoint, we can pad $M$ with extra pairs to get a reduction to the Hidden Matching problem.
 
         The only case where we will fail is if the hidden matching protocol returns $(i, j, x_i \oplus x_j)$ such that $(i, j) \notin M$. We can reduce this probability by repeating the protocol $O(k/\alpha)$ times for some $k \ll \alpha n$ to get a high probability of successfully finding one bit of $Mx$ with $O(\log n)$ bits of communication.
 
@@ -303,7 +285,7 @@
 
         $$p_M(z) = \frac{|\{x \in A|Mx = z\}|}{|A|}.$$
 
-        Gavinsky et al.~ showed that as Alice's message becomes shorter than $O(\sqrt{n/\alpha})$, this probability distribution becomes arbitrarily close to the uniform distribution. They start by looking at the expected value of the squared total variational distance between the probability distribution and the uniform distribution:
+        Gavinsky et al.~showed that as Alice's message becomes shorter than $O(\sqrt{n/\alpha})$, this probability distribution becomes arbitrarily close to the uniform distribution. They start by looking at the expected value of the squared total variational distance between the probability distribution and the uniform distribution:
 
         $$\mathbb{E}_M[\|p_M - U\|_{tvd}^2] = \mathbb{E}_M[(\sum_{z \in \{0, 1\}^{\alpha n}}|p_M(z) - U(z)|)^2]$$
 
@@ -389,12 +371,14 @@
 
         $$\frac{2^{2n}}{|A|^2}\left(\frac{8 e\alpha c}{n}\right)^{2c}\sum_{\textrm{even }k=4c}^{2\alpha n}\sum_{v:|v| = k}\widehat{1_A}(v)^2 \leq \frac{2^n}{|A|}\left(\frac{8 e\alpha c}{n}\right)^{2c} \leq 2^c\left(\frac{8 e\alpha c}{n}\right)^{2c} \leq \left(\frac{8\sqrt{2} e\gamma\epsilon\sqrt{n}}{\sqrt{\alpha}}\right)^{2c}$$
 
-        Again, this equation can be bounded by $\epsilon^2/2$ for small enough $\gamma$. By adding these two cases together, we find that the squared total variation distance is at most $\epsilon^2$. To conclude, we use Jensen's inequality:
+        Again, this equation can be bounded by $\epsilon^2/2$ for small enough $\gamma$, as $\alpha/n < 1$, $c \geq 1$. By adding these two cases together, we find that the squared total variation distance is at most $\epsilon^2$. To conclude, we use Jensen's inequality:
 
         $$(\mathbb{E}_M[\|p_M - U\|_{tvd}])^2 \leq \mathbb{E}_M[\|p_M - U\|_{tvd}^2] \leq \epsilon^2$$
 
         We conclude that if Alice sends fewer than $\sqrt{n/\alpha}$ bits of classical data to Bob then this distribution is indistinguishable form uniform.
         \end{proof}
+
+        One potential weakness with this proof is the use of $gamma$, which is to essentially force the message to be small enough that this proof holds. It would be interesting to see to what extent we can bound this relation if $\gamma = 1$.
 
         A more general version of the problem was explored by Verbin and Yu in 2011 \cite{Verbin:2011:SCC:2133036.2133038}, where showed that $t$-dimensional hypermatching requires $\Omega(n^{1-1/t})$ bits of classical communication. Note that $t=2$ is consistent with Bar-Yossef, Jayram and Kerenidis' results for perfect matching \cite{doi:10.1137/060651835}.
 
@@ -420,7 +404,7 @@
     \bibliographystyle{alpha}
     \bibliography{quantum_communication_complexity}{}
 
-    \appendix
+    \begin{appendices}
 
     \section{Nayak's Proof of Quantum Communication Complexity}
     \label{sec:nayak}
@@ -535,5 +519,7 @@
         \subsection{Non-Local Boxes}
 
         Non-local boxes act as a similar resource to entanglement, where Alice and Bob are each given a black box. If Alice inputs a bit $x$ into her box, and Bob inputs a bit $y$ into his box, then Alice will get bit $a$ and Bob will get bit $b$, subject to the rule that $x \wedge y = a \oplus b$. They were first proposed by Rohrlich and Popescu \cite{quant-ph/9508009} to see what a maximally non-local experiment would look like. Since then, several properties have been proven and summarised by Buhrman et al.~\cite{RevModPhys.82.665}. Of particular note, it was shown by van Dam \cite{Dam2012} that the existence of non-local boxes would mean that all distributed computation could be performed using a single bit of communication between parties.
+
+        \end{appendices}
 
 \end{document}
