@@ -74,7 +74,7 @@
 
         Another model by Cleve and Buhrman \cite{PhysRevA.56.1201} does not use the physical sending of data between the parties, but instead uses the measurement of entangled particles for remote computation. While our focus for this report however will be on the former, it is possible to simulate communicating $l$ individual qubits by use of $l$ entangled pairs and $2l$ classical bits of communication, via quantum teleportation \cite{PhysRevLett.70.1895}. Likewise, it is possible to simulate this model by the ability to communicate quantum states: Alice generates entangled pairs of qubits and sends one of the pair to Bob. This and other models are briefly discussed in Appendix~\ref{sec:other-models}.
 
-        Because of the well-established techniques for lower-bounding classical communication complexity, a common area of research is to see if there are any problems which quantum protocols can solve by communicating fewer qubits than the number of classical bits required by lower bounds. Finding quantum protocols that beat classical lower bounds can give us intuition on the difference between quantum and classical encoding of data. These protocols will be the focus of Section~\ref{sec:cc}.
+        Because of the well-established techniques for lower-bounding classical communication complexity, a common area of research is to see if there are any problems which quantum protocols can solve by communicating fewer qubits than the number of classical bits required by lower bounds. Finding quantum protocols that beat classical lower bounds can give us intuition on the difference between quantum and classical encoding of data. These protocols will be the focus of Section~\ref{sec:separations}.
 
         \subsection{Holevo's Theorem}
 
@@ -89,7 +89,7 @@
 
         \begin{theorem}
             \label{thm:nayak}
-            Any quantum protocol for COMMUNICATION that uses $O(2^m)$ qubits of communication succeeds with probability at most $2^{m-n}$.
+            Any quantum protocol for COMMUNICATION that uses $O(m)$ qubits of communication succeeds with probability at most $2^{m-n}$.
         \end{theorem}
 
         We can prove Theorem~\ref{thm:nayak} by Holevo's theorem, but a later proof by Nayak \cite{814608} explains this result explicitly for encoding classical data in quantum data. This proof is given in Appendix~\ref{sec:nayak}.
@@ -114,7 +114,7 @@
 
         \subsection{Distributed Deutsch-Jozsa}
 
-        The Distributed Deutsch-Jozsa problem, first introduced by Buhrman, Cleve and Wigderson \cite{Buhrman:1998:QVC:276698.276713}, was the first example of an exponential separation between quantum and classical computation complexity. Prior to this, the largest gaps between classical and quantum communication were constant factors \cite{PhysRevA.56.1201}. The problem, and its quantum protocol as described in Buhrman et al.~\cite{RevModPhys.82.665}, are stated as follows, where $d(x, y)$ is the Hamming distance between $x$ and $y$ and $U_x = \sum_{i=0}^{n-1}(-1)^{x_i}|i\rangle\langle i|$ for $x \in {0, 1}^n$:
+        The Distributed Deutsch-Jozsa problem, first introduced by Buhrman, Cleve and Wigderson \cite{Buhrman:1998:QVC:276698.276713}, was the first example of an exponential separation between quantum and classical computation complexity. Prior to this, the largest gaps between classical and quantum communication were constant factors \cite{PhysRevA.56.1201}. The problem, and its quantum protocol as described in Buhrman et al.~\cite{RevModPhys.82.665}, are stated as follows, where $d(x, y)$ is the Hamming distance between $x$ and $y$ and $U_x = \sum_{i=0}^{n-1}(-1)^{x_i}|i\rangle\langle i|$ for $x \in \{0, 1\}^n$:
 
         \begin{codebox}
             \Procname{Protocol $\proc{DISTRIBUTED DEUTSCH-JOZSA}$}
@@ -171,14 +171,14 @@
 
         Classically, it has been shown by Miltersen et al.~\cite{Miltersen199837} that any one-way randomised protocol with completeness probability of $1/2$ and perfect soundness must use $\Omega(\log^2|G|)$ bits of communication. Aaronson et al.~ have conjectured that this bound still holds even in a bounded-error setting.
 
-        So if we can find a total subgroup membership function that cannot classically be solved using $O(\log |G|)$ bits of communication, then we will have a quadratic gap for a total function. The problem is that there are many subgroups which can be solved classically. For example, Aaronson et al.~gave the following theorem for normal subgroups:
+        So if we can find a total subgroup membership function that cannot classically be solved using $O(\log |G|)$ bits of communication, then we will have a polynomial gap for a total function. The problem is that there are many subgroups which can be solved classically. For example, Aaronson et al.~gave the following theorem for normal subgroups:
 
         \begin{theorem}
             \label{thm:norm-sg-membership}
             For normal subgroup $H \in \mathscr{H}_G, y \in G$ there is an $O(\log|G|)$ protocol which outputs with probability $1$ if $y \in H$ and $0$ with probability at least $1/2$ if $y \notin H$.
         \end{theorem}
 
-        To explain this classical protocol, we first need to describe complex characters. For any complex field representation $\rho$ of $G$, the complex character $\chi$ is the function $\chi(g) = \textrm{tr}(\rho(g))~\forall~g\in G$. For any two elements $g, g' \in G$, we have the relation that $\chi(gg'g^{-1}) = \chi(g)$. $\chi(1)$ is the dimension of $\rho$, and the kernel of $\chi$, denoted $\textrm{ker}(\chi) = \{g \in G|\chi(g) = chi(1)\}$. If $\rho$ is irreducible then $\chi$ is an irreducible character, and the set of irreducible complex characters of $G$ is denoted $\textrm{Char}(g)$. If $H$ is a normal subgroup of $G$, then let
+        To explain this classical protocol, we first need to describe complex characters. For any complex field representation $\rho$ of $G$, the complex character $\chi$ is the function $\chi(g) = \textrm{tr}(\rho(g))~\forall~g\in G$. For any two elements $g, g' \in G$, we have the relation that $\chi(gg'g^{-1}) = \chi(g)$. If $1$ is the identity elemnent of $G$, then $\chi(1)$ is the dimension of $\rho$, and the kernel of $\chi$, denoted $\textrm{ker}(\chi) = \{g \in G|\chi(g) = \chi(1)\}$. If $\rho$ is irreducible then $\chi$ is an irreducible character, and the set of irreducible complex characters of $G$ is denoted $\textrm{Char}(g)$. If $H$ is a normal subgroup of $G$, then let
 
         $$\Lambda_H = \{\chi \in \textrm{G}|H\subseteq \textrm{ker}(\chi)\}.$$
 
@@ -219,7 +219,7 @@
         \subsection{Hidden Matching}
         \label{sec:hidden-matching}
 
-        A matching $M$ is a sequence of $k$ pairs $(i_1, j_1), (i_2, j_2),...,(i_k, j_k) \in [n]^2$. If no integer appears in any pair more than once, then the pairs are disjoint. A matching is said to be partial the pairs are disjoint but some indexes do not appear in any pair, and perfect if each integer appears in exactly one pair. A matching $M$ together with an $n$-bit string $x$ define a $k$-bit string as follows:
+        A matching $M$ is a sequence of $k$ disjoint pairs $(i_1, j_1), (i_2, j_2),...,(i_k, j_k) \in [n]^2$. A matching is said to be partial if some indexes do not appear in any pair, and perfect if each integer appears in exactly one pair. A matching $M$ together with an $n$-bit string $x$ define a $k$-bit string as follows:
 
         $$Mx = (x_{i_1} \oplus x_{j_1}), (x_{i_2} \oplus x_{j_2}), ... (x_{i_k} \oplus x_{j_k})$$
 
@@ -275,11 +275,11 @@
         So how well can we solve this problem with classical communication? Gavinsky et al.~\cite{Gavinsky:2007:ESO:1250790.1250866} proved the following:
 
         \begin{theorem}
-            A random one-way protocol for $\alpha$-Matching problem with deterministic Alice requires $O(\sqrt{n/\alpha})$ bits of communication.
+            A random one-way protocol for $\alpha$-Matching problem with deterministic Alice requires $\Omega(\sqrt{n/\alpha})$ bits of communication.
         \end{theorem}
 
         \begin{proof}
-        We can prove this by asking how much Bob can learn if Alice sends them $c$ bits, where $1 \leq c \leq \gamma \epsilon\sqrt{n/\alpha}$, for some $\epsilon > 0, \alpha \in (0,1/4]$ and a carefully chosen value of $\gamma$ which will be used later.
+        We can prove this by asking how much Bob can learn if Alice sends him $c$ bits, where $1 \leq c \leq \gamma \epsilon\sqrt{n/\alpha}$, for some $\epsilon > 0, \alpha \in (0,1/4]$ and a carefully chosen value of $\gamma$ which will be used later.
 
         If Alice's message is deterministic based on $x$, then the $c$ bits Alice sends allows Bob to define a set $A \subseteq \{0, 1\}^n$ such that $|A| \geq 2^{n-c}$ of bit strings from which Bob must be able to guess Alice's input $x$. The probability of Bob succeeding then is the probability of him picking a bit string $x' \in A$ such that $Mx = Mx'$. We define the probability of Bob finding a string $x$ such that $Mx = z$ for some $k$-bit string $z$ as
 
@@ -297,7 +297,7 @@
 
         $$2^{2\alpha n}\mathbb{E}_M[\langle 1, |p_M(z) - U(z)|\rangle^2] \leq 2^{2\alpha n}\mathbb{E_M}[\|1\|_2^2\|p_M - U\|_2^2] = 2^{2\alpha n}\mathbb{E}_M[\|p_M - U\|_2^2]$$
 
-        where $\|f\|_2^2 = \langle f, f\rangle$ is the $l_2$-norm. We then use Parseval's identity and note that $\widehat{U}(z) = \widehat{f}(z)$ if $z = 0$ and $\widehat{U}(z) = 0$ otherwise.
+        where $\|f\|_2^2 = \langle f, f\rangle$ is the $l_2$-norm. We then use Parseval's identity and note that $\widehat{U}(z) = \widehat{f}(z) = 2^{-\alpha n}$ if $z = 0$ and $\widehat{U}(z) = 0$ otherwise.
 
         $$2^{2\alpha n}\mathbb{E_M}[\|p_M - U\|_2^2] = 2^{2\alpha n}\mathbb{E}_M\left[\sum_{z \in \{0, 1\}^{\alpha n}}(\widehat{p_M}(z) - \widehat{U}(z))^2\right] = 2^{2\alpha n}\mathbb{E}_M\left[\sum_{z \in \{0, 1\}^{\alpha n}\setminus\{0^{\alpha n}\}}\widehat{p_M}(z)^2\right]$$
 
@@ -323,7 +323,7 @@
 
         $$2^{2\alpha n}\mathbb{E}_M\left[\sum_{z \in \{0, 1\}^{\alpha n}\setminus\{0^{\alpha n}\}}\widehat{p_M}(z)^2\right] = \frac{2^{2n}}{|A|^2}\mathbb{E}_M\left[\sum_{z \in \{0, 1\}^{\alpha n}\setminus\{0^n\}}\widehat{1_A}(M^Tz)^2\right].$$
 
-        Next, we move from summing over $\alpha-n$ bit strings to summing over $n$-bit strings, and note that the set $V = |\{s \in \{0, 1\}^{\alpha n}|M^Ts = v\}| \leq 1 ~\forall~ v \in \{0, 1\}^n$. This means that our expectation over $M$ is a probability:
+        Next, we move from summing over $\alpha n$-bit strings to summing over $n$-bit strings, and note that the set $V = |\{s \in \{0, 1\}^{\alpha n}|M^Ts = v\}| \leq 1 ~\forall~ v \in \{0, 1\}^n$. This means that our expectation over $M$ is a probability:
 
         \begin{align*}
             \frac{2^{2n}}{|A|^2}\mathbb{E}_M\left[\sum_{z \in \{0, 1\}^{\alpha n}\setminus\{0^n\}}\widehat{1_A}(M^Tz)^2\right] &= \frac{2^{2n}}{|A|^2}\mathbb{E}_M\left[\sum_{v \in \{0, 1\}^n\setminus\{0^n\}}|\{s \in \{0, 1\}^{\alpha n}|M^Ts = v\}|\widehat{1_A}(v)^2\right]\\
@@ -378,7 +378,7 @@
         We conclude that if Alice sends fewer than $\sqrt{n/\alpha}$ bits of classical data to Bob then this distribution is indistinguishable form uniform.
         \end{proof}
 
-        One potential weakness with this proof is the use of $gamma$, which is to essentially force the message to be small enough that this proof holds. It would be interesting to see to what extent we can bound this relation if $\gamma = 1$.
+        One potential weakness with this proof is the use of $\gamma$, which is to essentially force the message to be small enough that this proof holds. It would be interesting to see to what extent we can bound this relation if $\gamma = 1$.
 
         A more general version of the problem was explored by Verbin and Yu in 2011 \cite{Verbin:2011:SCC:2133036.2133038}, where showed that $t$-dimensional hypermatching requires $\Omega(n^{1-1/t})$ bits of classical communication. Note that $t=2$ is consistent with Bar-Yossef, Jayram and Kerenidis' results for perfect matching \cite{doi:10.1137/060651835}.
 
@@ -518,7 +518,7 @@
 
         \subsection{Non-Local Boxes}
 
-        Non-local boxes act as a similar resource to entanglement, where Alice and Bob are each given a black box. If Alice inputs a bit $x$ into her box, and Bob inputs a bit $y$ into his box, then Alice will get bit $a$ and Bob will get bit $b$, subject to the rule that $x \wedge y = a \oplus b$. They were first proposed by Rohrlich and Popescu \cite{quant-ph/9508009} to see what a maximally non-local experiment would look like. Since then, several properties have been proven and summarised by Buhrman et al.~\cite{RevModPhys.82.665}. Of particular note, it was shown by van Dam \cite{Dam2012} that the existence of non-local boxes would mean that all distributed computation could be performed using a single bit of communication between parties.
+        Non-local boxes act as a similar resource to entanglement, where Alice and Bob are each given a black box. If Alice inputs a bit $x$ into her box, and Bob inputs a bit $y$ into his box, then Alice will get bit $a$ and Bob will get bit $b$, subject to the rule that $x \wedge y = a \oplus b$. They were first proposed by Popescu and Rohrlich \cite{10.1007/BF02058098} to see what a maximally non-local experiment would look like. Since then, several properties have been proven and summarised by Buhrman et al.~\cite{RevModPhys.82.665}. Of particular note, it was shown by van Dam \cite{Dam2012} that the existence of non-local boxes would mean that all distributed computation could be performed using a single bit of communication between parties.
 
         \end{appendices}
 

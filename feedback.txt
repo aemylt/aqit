@@ -6,30 +6,30 @@ Some specific comments:
 
 - p1-2: the introduction to the communication complexity model would be clearer if it stated explicitly what the requirements are on probability of error for different models (for example, failure probability at most 1/3); and also that Alice and Bob are allowed to use randomness.
 
-- p2, end of Sec 2.1: "Section 2" -> "Section 3"?
+Fixed - p2, end of Sec 2.1: "Section 2" -> "Section 3"?
 
-- p3, Theorem 2.1: I think O(2^m) should be m.
+Fixed - p3, Theorem 2.1: I think O(2^m) should be m.
 
-- p3, Sec 3.1: x \in 0,1^n: missing braces around 0,1.
+Fixed - p3, Sec 3.1: x \in 0,1^n: missing braces around 0,1.
 
 - p4, end of page: "completeness" and "soundness" are used here without having been defined.
 
-- p4, end of page: the logical implication "If we can find a total subgroup membership function that cannot classically be solved using O(log |G|) bits of communication, then we will have a quadratic gap" isn't right -- for example, there could be a function that can be computed classically using O(log^{3/2} |G|) bits, giving a subquadratic gap.
+Fixed, polynomial now - p4, end of page: the logical implication "If we can find a total subgroup membership function that cannot classically be solved using O(log |G|) bits of communication, then we will have a quadratic gap" isn't right -- for example, there could be a function that can be computed classically using O(log^{3/2} |G|) bits, giving a subquadratic gap.
 
-- p5, top: the use of "1" for the identity element in G should be defined; "chi(1)" should be \chi(1)
+Fixed - p5, top: the use of "1" for the identity element in G should be defined; "chi(1)" should be \chi(1)
 
-- p5, bottom: usually a matching is a sequence of *disjoint* pairs.
+Fixed, removed point - p5, bottom: usually a matching is a sequence of *disjoint* pairs.
 
 - p6-7, Theorem 3.3 & 3.4: the statement and proofs of these seem to have misunderstood the randomised communication complexity model. In order to prove a lower bound on randomised communication complexity, it's sufficient to prove a lower bound on deterministic communication complexity, for protocols that succeed on at least 2/3 of the inputs (under some distribution on the inputs). This is known as the "Yao principle". So this is why lower bounds consider a deterministic message from Alice to Bob.
 
-- p7, Theorem 3.4: O should be \Omega in the theorem; in the first line of the proof, "them" -> "him"
+Fixed - p7, Theorem 3.4: O should be \Omega in the theorem; in the first line of the proof, "them" -> "him"
 
-- p7, close to bottom: I think \hat{U}(z) = 2^{-\alpha n} if z=0, not \hat{f}(z).
+Clarified. Paper claims that both are equal. - p7, close to bottom: I think \hat{U}(z) = 2^{-\alpha n} if z=0, not \hat{f}(z).
 
 - p8, first line of text: is the claim after "Note..." the right way round? It seems that for the next line of the proof you need |{y : My = s}| = 1, not |{s : My=s}| = 1, which is what the text states is true.
 
-- p8, middle of page: \alpha-n should be \alpha n
+Fixed - p8, middle of page: \alpha-n should be \alpha n
 
-- p10, near top: gamma should be \gamma
+Fixed - p10, near top: gamma should be \gamma
 
-- bibliography: [RP95] was by Popescu and Rohrlich (not vice versa) and was published in Foundations of Physics.
+Fixed - bibliography: [RP95] was by Popescu and Rohrlich (not vice versa) and was published in Foundations of Physics.
